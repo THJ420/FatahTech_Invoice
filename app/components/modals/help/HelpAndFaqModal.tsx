@@ -46,10 +46,12 @@ type HelpAndFaqModalProps = {
 /**
  * The help surface behind the navbar button.
  *
- * Deliberately dark in both themes. The app itself follows the system theme, but
- * a panel that only ever appears over the builder reads better as one fixed
- * surface than as a second thing that changes colour — and it keeps the
- * illustrated header and the accent gradients legible in light mode too.
+ * Styled entirely with the theme tokens (`bg-card`, `border-border`,
+ * `text-muted-foreground`, …) rather than a fixed palette, so it is a light
+ * panel in a light session and a dark one in a dark session — a white modal
+ * over a dark builder, or the reverse, reads as a rendering bug. The only
+ * literals left are the accent gradients in the header and the green of the
+ * privacy note, both of which carry a `dark:` variant.
  *
  * Loaded on first open (see HelpAndFaqButton), so the copy here costs the
  * builder's initial bundle nothing.
@@ -63,22 +65,18 @@ const HelpAndFaqModal = ({ open, onOpenChange }: HelpAndFaqModalProps) => {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent
-                // The default scrim is the app background; this one has to be
-                // dark in light mode too, since the panel itself always is.
-                overlayClassName="bg-slate-950/80"
-                className="flex max-h-[88vh] w-[calc(100vw-2rem)] max-w-3xl flex-col gap-0 overflow-hidden rounded-2xl border-white/10 bg-[#070d19] p-0 text-slate-200 shadow-[0_30px_90px_-20px_rgba(0,0,0,0.9)]"
-            >
+            <DialogContent className="flex max-h-[88vh] w-[calc(100vw-2rem)] max-w-3xl flex-col gap-0 overflow-hidden rounded-2xl border-border bg-card p-0 text-card-foreground shadow-2xl">
                 {/* Header */}
-                <div className="relative shrink-0 overflow-hidden border-b border-white/10 px-6 pb-5 pt-6 sm:px-8">
+                <div className="relative shrink-0 overflow-hidden border-b border-border px-6 pb-5 pt-6 sm:px-8">
                     {/*
                      * Two very low-opacity radials, the same trick the dark
                      * page background uses — they give the panel a light
-                     * source without an image asset.
+                     * source without an image asset. Weaker in light mode,
+                     * where the same opacity would tint the whole header.
                      */}
                     <div
                         aria-hidden
-                        className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-primary/25 blur-3xl"
+                        className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full bg-primary/10 blur-3xl dark:bg-primary/25"
                     />
                     <div
                         aria-hidden
@@ -86,16 +84,16 @@ const HelpAndFaqModal = ({ open, onOpenChange }: HelpAndFaqModalProps) => {
                     />
 
                     <div className="relative flex items-start gap-3">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-cyan-400 text-white shadow-lg shadow-primary/30">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-cyan-400 text-white shadow-lg shadow-primary/25">
                             <HelpCircle className="h-5 w-5" />
                         </span>
 
                         {/* `pe-8` keeps the title clear of the dialog's close button. */}
                         <div className="min-w-0 pe-8">
-                            <DialogTitle className="text-lg font-semibold tracking-tight text-white">
+                            <DialogTitle className="text-lg font-semibold tracking-tight text-foreground">
                                 {_t("help.title")}
                             </DialogTitle>
-                            <DialogDescription className="mt-1 text-sm text-slate-400">
+                            <DialogDescription className="mt-1 text-sm text-muted-foreground">
                                 {_t("help.subtitle")}
                             </DialogDescription>
                         </div>
@@ -107,17 +105,18 @@ const HelpAndFaqModal = ({ open, onOpenChange }: HelpAndFaqModalProps) => {
                     className="flex min-h-0 flex-1 flex-col"
                 >
                     <div className="shrink-0 px-6 pt-4 sm:px-8">
-                        <TabsList className="h-9 justify-start rounded-lg bg-white/5 p-1">
+                        {/* The default tab styling is already theme-aware. */}
+                        <TabsList className="h-9 justify-start">
                             <TabsTrigger
                                 value="about"
-                                className="gap-1.5 rounded-md px-3 text-sm text-slate-400 hover:text-slate-200 data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:shadow-none"
+                                className="gap-1.5 px-3 text-sm"
                             >
                                 <HelpCircle className="h-4 w-4" />
                                 {_t("help.tabs.about")}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="guide"
-                                className="gap-1.5 rounded-md px-3 text-sm text-slate-400 hover:text-slate-200 data-[state=active]:bg-white/10 data-[state=active]:text-white data-[state=active]:shadow-none"
+                                className="gap-1.5 px-3 text-sm"
                             >
                                 <BookOpen className="h-4 w-4" />
                                 {_t("help.tabs.guide")}
@@ -132,28 +131,28 @@ const HelpAndFaqModal = ({ open, onOpenChange }: HelpAndFaqModalProps) => {
                     >
                         <div className="space-y-6">
                             <section>
-                                <h3 className="text-xl font-semibold tracking-tight text-white">
+                                <h3 className="text-xl font-semibold tracking-tight text-foreground">
                                     {messages.landing?.h1}
                                 </h3>
-                                <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                                     {messages.landing?.intro}
                                 </p>
                             </section>
 
-                            <div className="flex items-start gap-3 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] p-4">
-                                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                            <div className="flex items-start gap-3 rounded-xl border border-emerald-600/20 bg-emerald-500/[0.07] p-4 dark:border-emerald-400/20 dark:bg-emerald-400/[0.06]">
+                                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
                                 <div>
-                                    <p className="text-sm font-medium text-emerald-100">
+                                    <p className="text-sm font-medium text-emerald-900 dark:text-emerald-100">
                                         {_t("help.about.privacyHeading")}
                                     </p>
-                                    <p className="mt-1 text-sm leading-relaxed text-emerald-100/60">
+                                    <p className="mt-1 text-sm leading-relaxed text-emerald-800/70 dark:text-emerald-100/60">
                                         {_t("help.about.privacyBody")}
                                     </p>
                                 </div>
                             </div>
 
                             <section>
-                                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                                <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                     {_t("help.about.faqHeading")}
                                 </h4>
 
@@ -164,17 +163,17 @@ const HelpAndFaqModal = ({ open, onOpenChange }: HelpAndFaqModalProps) => {
                                  * this panel light enough to load on first
                                  * click.
                                  */}
-                                <div className="mt-3 divide-y divide-white/5 overflow-hidden rounded-xl border border-white/5 bg-white/[0.02] px-4">
+                                <div className="mt-3 divide-y divide-border overflow-hidden rounded-xl border border-border bg-muted/40 px-4">
                                     {faqs.map((item) => (
                                         <details
                                             key={item.q}
                                             className="group last:border-b-0"
                                         >
-                                            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-3.5 text-sm font-medium text-slate-100 transition-colors hover:text-white [&::-webkit-details-marker]:hidden">
+                                            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-3.5 text-sm font-medium text-foreground transition-colors hover:text-primary [&::-webkit-details-marker]:hidden">
                                                 <span>{item.q}</span>
-                                                <ChevronDown className="h-4 w-4 shrink-0 text-slate-500 transition-transform duration-200 group-open:rotate-180" />
+                                                <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
                                             </summary>
-                                            <p className="pb-4 pe-8 text-sm leading-relaxed text-slate-400">
+                                            <p className="pb-4 pe-8 text-sm leading-relaxed text-muted-foreground">
                                                 {item.a}
                                             </p>
                                         </details>
@@ -182,11 +181,11 @@ const HelpAndFaqModal = ({ open, onOpenChange }: HelpAndFaqModalProps) => {
                                 </div>
                             </section>
 
-                            <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4">
-                                <p className="text-sm font-medium text-slate-100">
+                            <div className="rounded-xl border border-border bg-muted/40 p-4">
+                                <p className="text-sm font-medium text-foreground">
                                     {_t("help.about.stillStuck")}
                                 </p>
-                                <p className="mt-1 text-sm leading-relaxed text-slate-400">
+                                <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                                     {_t("help.about.stillStuckBody")}
                                 </p>
                             </div>
@@ -200,10 +199,10 @@ const HelpAndFaqModal = ({ open, onOpenChange }: HelpAndFaqModalProps) => {
                     >
                         <div className="space-y-5">
                             <section>
-                                <h3 className="text-xl font-semibold tracking-tight text-white">
+                                <h3 className="text-xl font-semibold tracking-tight text-foreground">
                                     {_t("help.guide.heading")}
                                 </h3>
-                                <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                                     {_t("help.guide.intro")}
                                 </p>
                             </section>
@@ -212,16 +211,16 @@ const HelpAndFaqModal = ({ open, onOpenChange }: HelpAndFaqModalProps) => {
                                 {steps.map((step, index) => (
                                     <li
                                         key={step.title}
-                                        className="flex gap-4 rounded-xl border border-white/5 bg-white/[0.03] p-4 transition-colors hover:border-white/10 hover:bg-white/[0.05]"
+                                        className="flex gap-4 rounded-xl border border-border bg-muted/40 p-4 transition-colors hover:bg-muted/60"
                                     >
-                                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-sm font-semibold text-primary ring-1 ring-inset ring-white/10">
+                                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-semibold text-primary ring-1 ring-inset ring-border">
                                             {index + 1}
                                         </span>
                                         <div className="min-w-0">
-                                            <h4 className="text-sm font-semibold text-slate-100">
+                                            <h4 className="text-sm font-semibold text-foreground">
                                                 {step.title}
                                             </h4>
-                                            <p className="mt-1 text-sm leading-relaxed text-slate-400">
+                                            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                                                 {step.body}
                                             </p>
                                         </div>

@@ -1,15 +1,7 @@
 "use client";
 
-// Next
-
 // RHF
 import { useFormContext } from "react-hook-form";
-
-// Component
-import { BaseButton } from "@/app/components";
-
-// Variables
-import { FORM_FILL_VALUES } from "@/lib/variables";
 
 /**
  * Development-only scratch panel, mounted in the navbar's middle slot.
@@ -19,11 +11,15 @@ import { FORM_FILL_VALUES } from "@/lib/variables";
  * layouts replaced them — so both links threw. They are gone, and so is the
  * route they pointed at.
  *
- * Laid out in a row rather than two stacked columns, which is what made it
- * overflow the navbar.
+ * The "Fill in the form" button that lived here is gone too: the form now has
+ * one of its own, in the quick actions above the first field, and it fills a
+ * complete, valid invoice rather than the partial fixture this panel used. Two
+ * buttons with the same label in the same session was the confusing half of
+ * that; the other half was a dev fill that could not be printed, because its
+ * fixture predated the required payment terms.
  */
 const DevDebug = () => {
-    const { reset, formState } = useFormContext();
+    const { formState } = useFormContext();
 
     return (
         <div className="flex items-center gap-3 rounded-md border border-dashed border-destructive/60 px-3 py-1.5 text-xs">
@@ -37,16 +33,6 @@ const DevDebug = () => {
                     {formState.isDirty ? "Dirty" : "Clean"}
                 </span>
             </span>
-
-            <BaseButton
-                tooltipLabel="Form Test Fill"
-                variant="outline"
-                size="sm"
-                className="h-7 whitespace-nowrap"
-                onClick={() => reset(FORM_FILL_VALUES)}
-            >
-                Fill in the form
-            </BaseButton>
         </div>
     );
 };

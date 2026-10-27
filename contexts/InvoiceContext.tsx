@@ -33,6 +33,7 @@ import { InvoiceSchema } from "@/lib/schemas";
 
 // Helpers
 import { nextInvoiceNumber } from "@/lib/invoiceNumber";
+import { buildSampleInvoice } from "@/lib/sampleInvoice";
 
 // Variables
 import {
@@ -63,6 +64,8 @@ const defaultInvoiceContext = {
   draftPending: false,
   onFormSubmit: (values: InvoiceType) => {},
   newInvoice: () => {},
+  fillWithSampleData: () => {},
+  clearForm: () => {},
   printInvoice: async (data?: InvoiceType) => {},
   saveInvoice: () => {},
   deleteInvoice: (index: number) => {},
@@ -92,6 +95,8 @@ export const InvoiceContextProvider = ({
     newInvoiceSuccess,
     saveInvoiceSuccess,
     modifiedInvoiceSuccess,
+    formFilledWithSample,
+    formCleared,
     printInvoiceError,
     exportInvoiceError,
     importInvoiceError,
@@ -283,6 +288,47 @@ export const InvoiceContextProvider = ({
     newInvoiceSuccess();
   };
 
+  /**
+   * Replaces the form with a complete example invoice.
+   *
+   * The template and the theme are carried over from whatever the user is
+   * currently editing. The button exists to show a finished document, so
+   * quietly resetting their chosen layout at the same time would be a surprise
+   * unrelated to the data it fills in.
+   */
+  const fillWithSampleData = () => {
+    const current = getValues();
+
+    reset(
+      buildSampleInvoice({
+        pdfTemplate: current.details?.pdfTemplate,
+        theme: current.details?.theme,
+      })
+    );
+
+    formFilledWithSample();
+  };
+
+  /**
+   * Clears the form back to its blank defaults.
+   *
+   * `reset` on its own would leave the autosaved draft in place, so the next
+   * reload would restore exactly what the user just cleared. The pending value
+   * is dropped too — otherwise the debounce timer would write the form it is
+   * holding right back over the cleared one.
+   */
+  const clearForm = () => {
+    reset(FORM_DEFAULT_VALUES);
+
+    pendingDraftRef.current = null;
+    setDraftPending(false);
+    setDraftSavedAt(null);
+
+    void removeSecure(LOCAL_STORAGE_INVOICE_DRAFT_KEY);
+
+    formCleared();
+  };
+
   // TODO: Change function name. (saveInvoiceData maybe?)
   /**
    * Saves the invoice data to local storage.
@@ -420,6 +466,8 @@ export const InvoiceContextProvider = ({
         draftPending,
         onFormSubmit,
         newInvoice,
+        fillWithSampleData,
+        clearForm,
         printInvoice,
         saveInvoice,
         deleteInvoice,

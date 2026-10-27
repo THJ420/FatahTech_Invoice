@@ -107,10 +107,23 @@ const Providers = ({ children }: ProvidersProps) => {
 
   return (
     <DirectionProvider dir={dir}>
+    {/*
+     * Light is the product's default, not a guess at the operating system's.
+     *
+     * `defaultTheme="system"` meant a visitor whose OS was in dark mode got a
+     * dark invoice builder on their first visit — before they had expressed any
+     * preference, on a page whose whole subject is a white sheet of paper.
+     * `enableSystem={false}` removes the system option entirely, so the only
+     * states are the two the toggle offers and the first paint is always light.
+     *
+     * The choice is still remembered: next-themes writes the resolved theme to
+     * localStorage under `theme` on every change and reads it back before
+     * paint, so a returning visitor gets whichever mode they last picked.
+     */}
     <ThemeProvider
       attribute="class"
-      defaultTheme="system"
-      enableSystem
+      defaultTheme="light"
+      enableSystem={false}
       disableTransitionOnChange
     >
       <TranslationProvider>

@@ -22,6 +22,7 @@ import Charges from "./invoice/form/Charges";
 import PartyPicker from "./invoice/form/PartyPicker";
 import PaymentTermPresets from "./invoice/form/PaymentTermPresets";
 import AutosaveIndicator from "./invoice/form/AutosaveIndicator";
+import FormQuickActions from "./invoice/form/FormQuickActions";
 import TemplateGallery from "./invoice/form/TemplateGallery";
 
 // Form / Wizard
@@ -123,6 +124,7 @@ export {
     PartyPicker,
     PaymentTermPresets,
     AutosaveIndicator,
+    FormQuickActions,
     TemplateGallery,
     WizardNavigation,
     WizardStep,

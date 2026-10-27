@@ -1426,6 +1426,76 @@ test.describe("invoice builder", () => {
         expect(problems, `page problems:\n${problems.join("\n")}`).toEqual([]);
     });
 
+    test("the first visit is light, and the choice is remembered", async ({
+        page,
+    }) => {
+        await page.goto("/en");
+
+        /*
+         * Light is the product's default, not a guess at the operating system's
+         * — the subject of the page is a white sheet of paper. Nothing is
+         * written to storage until the user actually chooses a mode.
+         */
+        await expect(page.locator("html")).not.toHaveClass(/dark/);
+        expect(await page.evaluate(() => localStorage.getItem("theme"))).toBe(
+            null
+        );
+
+        await page.getByRole("button", { name: "Toggle theme" }).click();
+        await expect(page.locator("html")).toHaveClass(/dark/);
+        expect(await page.evaluate(() => localStorage.getItem("theme"))).toBe(
+            "dark"
+        );
+
+        // A returning visitor gets the mode they last picked.
+        await page.reload();
+        await expect(page.locator("html")).toHaveClass(/dark/);
+    });
+
+    test("the quick actions fill the form and clear it again", async ({
+        page,
+    }) => {
+        const problems: string[] = [];
+        collectProblems(page, problems);
+
+        await page.goto("/en");
+
+        const form = page.getByRole("main");
+        const sender = page.locator('input[name="sender.name"]');
+        const receiver = page.locator('input[name="receiver.name"]');
+
+        await expect(sender).toHaveValue("");
+
+        /*
+         * Scoped to <main>: in development the navbar carries a debug panel of
+         * its own, and this action must be the one in the form.
+         */
+        await form.getByRole("button", { name: "Fill in the form" }).click();
+
+        await expect(sender).toHaveValue("Northwind Studio");
+        await expect(receiver).toHaveValue("Contoso Retail");
+        await expect(page.locator('input[name="sender.city"]')).toHaveValue(
+            "Amsterdam"
+        );
+
+        await form.getByRole("button", { name: "Clear all" }).click();
+
+        await expect(sender).toHaveValue("");
+        await expect(receiver).toHaveValue("");
+
+        /*
+         * Clearing has to drop the autosaved draft as well, or the next reload
+         * restores exactly what the user just cleared. The debounce means the
+         * draft is written a moment after the reset, so reload on the far side
+         * of it.
+         */
+        await page.waitForTimeout(1200);
+        await page.reload();
+        await expect(page.locator('input[name="sender.name"]')).toHaveValue("");
+
+        expect(problems, `page problems:\n${problems.join("\n")}`).toEqual([]);
+    });
+
     test("appearance chips drop down instead of opening the gallery", async ({
         page,
     }) => {

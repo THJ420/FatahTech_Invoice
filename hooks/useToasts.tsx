@@ -34,6 +34,30 @@ const useToasts = () => {
         });
     };
 
+    /*
+     * The two quick actions at the top of the form replace everything the user
+     * has typed, so both say plainly what just happened to their work — a
+     * silent change of that size is the kind of thing people only notice after
+     * they have lost something.
+     */
+    const formFilledWithSample = () => {
+        toast({
+            variant: "default",
+            title: "Sample invoice filled in",
+            description:
+                "Every field now holds example data. Edit anything you like — nothing has been saved over your invoices.",
+        });
+    };
+
+    const formCleared = () => {
+        toast({
+            variant: "default",
+            title: "Form cleared",
+            description:
+                "All fields are back to their defaults and the saved draft has been removed.",
+        });
+    };
+
     const saveInvoiceSuccess = () => {
         toast({
             variant: "default",
@@ -98,6 +122,8 @@ const useToasts = () => {
         partySaved,
         partyRemoved,
         newInvoiceSuccess,
+        formFilledWithSample,
+        formCleared,
         saveInvoiceSuccess,
         modifiedInvoiceSuccess,
         printInvoiceError,

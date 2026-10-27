@@ -8,6 +8,7 @@ import { useFormContext, useWatch } from "react-hook-form";
 // Components
 import {
     AutosaveIndicator,
+    FormQuickActions,
     WizardStep,
     BillFromSection,
     BillToSection,
@@ -71,11 +72,21 @@ const InvoiceForm = () => {
                   * headings made of the user's own data. The page's h1 is a
                   * visually hidden one in [locale]/page.tsx.
                   */}
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 shell:mb-3">
-                    <AutosaveIndicator />
-                    <span className="text-sm font-medium text-muted-foreground">
-                        {invoiceNumberLabel}
-                    </span>
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 shell:mb-3">
+                    <div className="flex min-w-0 items-center gap-3">
+                        <AutosaveIndicator />
+                        <span className="truncate text-sm font-medium text-muted-foreground">
+                            {invoiceNumberLabel}
+                        </span>
+                    </div>
+
+                    {/*
+                     * Above the first field, and wrapping onto its own line in
+                     * the narrow desktop rail: both of these replace the whole
+                     * form, so neither belongs inside a menu where it can be
+                     * hit while reaching for something else.
+                     */}
+                    <FormQuickActions />
                 </div>
 
                 {/*

@@ -3,6 +3,12 @@
     "title": "Invoice",
     "description": "Generate Invoice",
     "newInvBadge": "New Invoice",
+    "quickActions": {
+      "fill": "Fill in the form",
+      "fillTooltip": "Fill every field with a complete example invoice",
+      "clear": "Clear all",
+      "clearTooltip": "Clear every field and remove the saved draft"
+    },
     "wizard": {
       "fromAndTo": "From & To",
       "invoiceDetails": "Invoice Details",
