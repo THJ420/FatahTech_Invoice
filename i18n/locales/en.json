@@ -1,0 +1,544 @@
+{
+  "form": {
+    "title": "Invoice",
+    "description": "Generate Invoice",
+    "newInvBadge": "New Invoice",
+    "wizard": {
+      "fromAndTo": "From & To",
+      "invoiceDetails": "Invoice Details",
+      "lineItems": "Line Items",
+      "paymentInfo": "Payment Info",
+      "summary": "Summary",
+      "next": "Next",
+      "back": "Back",
+      "stepLabel": "Step",
+      "hasErrors": "has errors",
+      "progressLabel": "Invoice form steps",
+      "backTooltip": "Go back to the previous step",
+      "nextTooltip": "Go to the next step",
+      "stateComplete": "complete",
+      "stateIncomplete": "incomplete",
+      "upNext": "Up next",
+      "sections": "Sections"
+    },
+    "steps": {
+      "fromAndTo": {
+        "billFrom": "Bill From",
+        "billTo": "Bill To",
+        "name": "Name",
+        "address": "Address",
+        "zipCode": "Zip",
+        "city": "City",
+        "country": "Country",
+        "email": "Email",
+        "phone": "Phone",
+        "addCustomInput": "Add Custom Input",
+        "sender": "Sender",
+        "receiver": "Receiver",
+        "senderNamePlaceholder": "Your name",
+        "senderAddressPlaceholder": "Your address",
+        "senderZipPlaceholder": "Your zip code",
+        "senderCityPlaceholder": "Your city",
+        "senderCountryPlaceholder": "Your country",
+        "senderEmailPlaceholder": "Your email",
+        "senderPhonePlaceholder": "Your phone number",
+        "addSenderCustomInput": "Add custom input to sender",
+        "receiverNamePlaceholder": "Receiver name",
+        "receiverAddressPlaceholder": "Receiver address",
+        "receiverZipPlaceholder": "Receiver zip code",
+        "receiverCityPlaceholder": "Receiver city",
+        "receiverCountryPlaceholder": "Receiver country",
+        "receiverEmailPlaceholder": "Receiver email",
+        "receiverPhonePlaceholder": "Receiver phone number",
+        "addReceiverCustomInput": "Add custom input to receiver"
+      },
+      "invoiceDetails": {
+        "heading": "Invoice Details",
+        "invoiceLogo": {
+          "label": "Invoice Logo",
+          "placeholder": "Click to upload image"
+        },
+        "invoiceNumber": "Invoice Number",
+        "invoiceNumberPlaceholder": "Invoice number",
+        "issuedDate": "Issue Date",
+        "dueDate": "Due Date",
+        "currency": "Currency",
+        "currencyPlaceholder": "Select currency",
+        "purchaseOrderNumber": "Purchase order / reference",
+        "purchaseOrderNumberPlaceholder": "e.g. PO-2026-001",
+        "purchaseOrderNumberHelper": "Used as the buyer reference on e-invoices",
+        "taxId": "Tax ID / VAT ID",
+        "taxIdPlaceholder": "e.g. DE123456789",
+        "taxIdHelper": "Seller VAT or tax registration number (required for XRechnung)",
+        "headerText": "Header",
+        "footerText": "Footer",
+        "headerPlaceholder": "e.g. Company tagline or legal name",
+        "footerPlaceholder": "e.g. Payment terms, registration number or a disclaimer",
+        "headerHelper": "Shown above the invoice on every page",
+        "footerHelper": "Shown below the invoice on every page"
+      },
+      "lineItems": {
+        "heading": "Items",
+        "item": "Item",
+        "name": "Name",
+        "quantity": "Quantity",
+        "rate": "Rate",
+        "total": "Total",
+        "description": "Description",
+        "addNewItem": "Add a new item",
+        "addItemTooltip": "Add a new item to the list",
+        "removeItem": "Remove item",
+        "emptyName": "Empty name",
+        "itemNamePlaceholder": "Item name",
+        "itemTotalPlaceholder": "Item total",
+        "itemDescriptionPlaceholder": "Item description",
+        "moveUp": "Move the item up",
+        "moveDown": "Move the item down"
+      },
+      "paymentInfo": {
+        "heading": "Payment Information",
+        "bankName": "Bank Name",
+        "accountName": "Account Name",
+        "accountNumber": "Account Number"
+      },
+      "summary": {
+        "heading": "Summary",
+        "signature": {
+          "heading": "Signature",
+          "placeholder": "Click to add signature",
+          "description": "Choose a method to add your signature to the invoice",
+          "draw": "Draw",
+          "type": "Type",
+          "upload": "Upload"
+        },
+        "additionalNotes": "Additional Notes",
+        "additionalNotesPlaceholder": "Your additional notes",
+        "paymentTerms": "Payment Terms",
+        "paymentTermsPlaceholder": "e.g. Net 30",
+        "discount": "Discount",
+        "tax": "Tax",
+        "shipping": "Shipping",
+        "subTotal": "Subtotal",
+        "totalAmount": "Total Amount",
+        "includeTotalInWords": "Include Total in Words?",
+        "yes": "Yes",
+        "no": "No",
+        "remove": "Remove",
+        "terms": {
+          "dueOnReceipt": "Due on receipt",
+          "net15": "Net 15",
+          "net30": "Net 30",
+          "net60": "Net 60"
+        }
+      }
+    },
+    "autosave": {
+      "saving": "Saving\u2026",
+      "saved": "Saved",
+      "justNow": "just now"
+    }
+  },
+  "actions": {
+    "title": "Actions",
+    "description": "Operations and preview",
+    "loadInvoice": "Load Invoice",
+    "exportInvoice": "Export Invoice",
+    "newInvoice": "New Invoice",
+    "generatePdf": "Generate PDF",
+    "pdfView": "PDF View",
+    "preview": "Preview",
+    "previewTitle": "Invoice preview",
+    "generatePdfLoading": "Generating\u2026",
+    "generatePdfTooltip": "Generate your invoice PDF",
+    "printInvoice": "Print invoice",
+    "printInvoiceLoading": "Preparing\u2026",
+    "printInvoiceTooltip": "Open your browser's print dialog \u2014 print the invoice or save it as a PDF",
+    "loadInvoiceTooltip": "Open a saved invoice",
+    "exportInvoiceTooltip": "Export this invoice as a file",
+    "newInvoiceTooltip": "Start a new blank invoice",
+    "resetForm": "Reset Form",
+    "resetFormTitle": "Reset form?",
+    "resetFormDescription": "This will clear all fields and the saved draft.",
+    "resetFormConfirm": "Reset",
+    "resetFormTooltip": "Clear every field and the saved draft",
+    "livePreview": "Live Preview",
+    "finalPdf": "Final PDF",
+    "backToLivePreview": "Back to Live Preview",
+    "previewInTab": "Preview",
+    "download": "Download",
+    "print": "Print",
+    "save": "Save",
+    "sendToMail": "Send to mail",
+    "openPdf": "Open PDF",
+    "pdfReady": "Your invoice PDF is ready.",
+    "previewInTabTooltip": "Preview invoice in a new tab",
+    "downloadTooltip": "Download invoice PDF",
+    "printTooltip": "Print invoice",
+    "saveTooltip": "Save invoice in website",
+    "sendToMailTooltip": "Send invoice PDF to mail",
+    "importJson": "Import JSON",
+    "importJsonTooltip": "Import a JSON invoice file",
+    "moreActions": "More actions",
+    "fitToScreen": "Fit to screen",
+    "actualSize": "Actual size",
+    "printLive": "Print without uploading",
+    "printLiveTooltip": "Print the live preview directly \u2014 the invoice never leaves your browser",
+    "exportTitle": "Export the invoice",
+    "exportDescription": "Choose a file format. The e-invoice options produce standards-compliant XML.",
+    "exportJsonTooltip": "Export Invoice as JSON",
+    "exportCsvTooltip": "Export Invoice as CSV",
+    "exportXmlTooltip": "Export the app's own XML shape",
+    "exportXrechnungUbl": "XRechnung (UBL)",
+    "exportXrechnungCii": "XRechnung (CII)",
+    "exportZugferdCii": "ZUGFeRD (CII)",
+    "exportZugferdPdf": "ZUGFeRD PDF",
+    "exportZugferdPdfTooltip": "Attach the e-invoice XML to the generated PDF",
+    "exportZugferdPdfNeedsPdf": "Generate the PDF first, then export the ZUGFeRD hybrid file.",
+    "exportXrechnungHint": "German B2G/B2B \u00b7 EN 16931 \u00b7 XRechnung 3.0",
+    "exportZugferdHint": "German B2B \u00b7 EN 16931 \u00b7 Factur-X/ZUGFeRD CII",
+    "exportEInvoiceHeading": "E-invoices (EN 16931)",
+    "exportZugferdPdfCaveat": "The hybrid PDF embeds the XML but is not a certified PDF/A-3 file. Use it for testing and for recipients that only extract the attached XML."
+  },
+  "email": {
+    "title": "Send to email",
+    "description": "Please specify the email address for invoice delivery.",
+    "label": "Email",
+    "placeholder": "Enter email address",
+    "invalid": "Please enter a valid email address",
+    "sendTooltip": "Send invoice PDF",
+    "sending": "Sending email",
+    "send": "Send PDF"
+  },
+  "footer": {
+    "developedBy": "Developed by",
+    "guide": "How it works"
+  },
+  "navbar": {
+    "settings": "Settings",
+    "openSettings": "Open settings",
+    "language": "Language",
+    "github": "View the source on GitHub",
+    "githubLabel": "GitHub"
+  },
+  "help": {
+    "trigger": "Help & FAQ",
+    "triggerTooltip": "What this tool does, answers to common questions, and a how-to guide",
+    "title": "Help & FAQ",
+    "subtitle": "Everything you need to get an invoice out the door.",
+    "close": "Close",
+    "tabs": {
+      "about": "About & FAQs",
+      "guide": "User Guide"
+    },
+    "about": {
+      "faqHeading": "Frequently asked questions",
+      "privacyHeading": "Your data stays here",
+      "privacyBody": "Invoices, clients and drafts are stored in this browser and encrypted at rest. There is no account, no upload, and no server holding a copy.",
+      "stillStuck": "Still stuck?",
+      "stillStuckBody": "Reload the page for a clean form \u2014 your draft is restored automatically, and saved invoices are never touched."
+    },
+    "guide": {
+      "heading": "How to use FatahTech Invoice",
+      "intro": "Six steps from an empty form to a printed invoice or a whole batch of PDFs.",
+      "steps": {
+        "1": {
+          "title": "Fill in both parties",
+          "body": "Start with Bill From and Bill To. Enter a name, address, email and phone, then use Add custom input for anything else that belongs on the page \u2014 a VAT number, a contact person, a project code. Save a party you invoice often and it is one click away next time."
+        },
+        "2": {
+          "title": "Set the invoice details",
+          "body": "Give the invoice a number, an issue date and a due date, then choose the currency. This step also holds your logo, a header and footer line, the purchase-order reference and your tax ID \u2014 leave the last two empty unless your customer needs them."
+        },
+        "3": {
+          "title": "Add the line items",
+          "body": "Each row is a description, a quantity, a unit price and an optional tax rate or discount. Drag the handle to reorder rows. Use the charges section for a discount, tax or shipping applied to the whole invoice; totals update as you type."
+        },
+        "4": {
+          "title": "Customise the look",
+          "body": "Open the template gallery to compare all fifteen layouts with your own data in them, then set the accent colour, the typeface and the density. On a desktop you can click any part of the preview to jump straight to the field that produced it."
+        },
+        "5": {
+          "title": "Save it for later",
+          "body": "Save keeps the invoice in this browser, so Load Invoice can bring it back later. Everything you type is also written to a draft as you go \u2014 the indicator at the top of the form shows when it was last stored, so closing the tab costs you nothing."
+        },
+        "6": {
+          "title": "Print, export or go bulk",
+          "body": "Print invoice opens your browser's print dialog \u2014 choose Save as PDF there to get a file. Export invoice produces JSON, CSV, XML, XLSX, DOCX or an EN 16931 e-invoice. For a batch, Bulk Export turns a CSV or Excel file into a ZIP of finished PDFs."
+        }
+      }
+    }
+  },
+  "invoiceDocument": {
+    "invoiceNumber": "Invoice #",
+    "from": "From",
+    "billTo": "Bill to",
+    "invoiceDate": "Invoice date",
+    "dueDate": "Due date",
+    "item": "Item",
+    "qty": "Qty",
+    "rate": "Rate",
+    "amount": "Amount",
+    "description": "Description",
+    "proformaInvoice": "Proforma Invoice",
+    "packingList": "Packing List",
+    "purchaseOrder": "Purchase Order",
+    "contract": "Contract",
+    "packingListNote": "The goods listed above are packed as described.",
+    "totalItems": "Total items",
+    "totalQuantity": "Total quantity",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "tax": "Tax",
+    "shipping": "Shipping",
+    "total": "Total",
+    "totalInWords": "Total in words",
+    "additionalNotes": "Additional notes",
+    "paymentTerms": "Payment terms",
+    "signature": "Signature",
+    "paymentInfoHeading": "Please send the payment to this address",
+    "bankName": "Bank",
+    "accountName": "Account name",
+    "accountNumber": "Account no",
+    "contactHeading": "If you have any questions concerning this invoice, use the following contact information:",
+    "logoAlt": "Logo of {name}",
+    "signatureAlt": "Signature of {name}"
+  },
+  "gallery": {
+    "title": "Choose a template",
+    "description": "Pick a layout, then set the accent colour, typeface and density. Changes preview live.",
+    "templateLabel": "Template",
+    "changeTemplate": "Change template",
+    "accent": "Accent",
+    "font": "Font",
+    "density": "Density",
+    "comfortable": "Comfortable",
+    "compact": "Compact",
+    "spacious": "Spacious",
+    "customColor": "Custom colour",
+    "reset": "Reset",
+    "appearanceControls": "Appearance",
+    "changeAppearance": "Change the invoice's appearance"
+  },
+  "meta": {
+    "title": "Free Invoice Generator | FatahTech Invoice",
+    "description": "Create a professional invoice in minutes. Fifteen templates, your own colours and logo, client-side printing, and bulk ZIP export. Free, no account needed.",
+    "ogTitle": "Free invoice generator",
+    "ogDescription": "Fifteen templates. Print or save as PDF, or export a batch as a ZIP. No account."
+  },
+  "landing": {
+    "h1": "Free invoice generator",
+    "intro": "FatahTech Invoice builds professional invoices in your browser. Choose one of fifteen templates, set your accent colour and typeface, add your logo and signature, then print, save as PDF, or export a whole batch from a spreadsheet. Nothing is uploaded to an account, because there are no accounts.",
+    "guideH1": "How FatahTech Invoice works",
+    "guideIntro": "A walk through what the invoice generator does and how to use it: the fifteen templates, the things you can change about them, and the steps from an empty form to a printed invoice or a bulk ZIP export.",
+    "featuresHeading": "What you get",
+    "features": {
+      "1": {
+        "title": "Fifteen templates",
+        "body": "Genuinely different layouts, not one layout in fifteen colours \u2014 full-bleed headers, accent rails, centred mastheads, ruled forms and a compact receipt style. Every one is a proper A4 page and paginates correctly when the invoice runs long."
+      },
+      "2": {
+        "title": "Make it yours",
+        "body": "Pick an accent colour from the presets or any hex you like, choose between four typefaces, and set the density to fit twenty line items on one page or let three of them breathe. Add a logo and a drawn, typed or uploaded signature."
+      },
+      "3": {
+        "title": "Print, PDF or bulk export",
+        "body": "Print from the browser or use its Save as PDF option, with the invoice fonts embedded so every copy looks the same. For a batch, upload a CSV or Excel file, map the columns and download every invoice as a single ZIP \u2014 no server involved."
+      }
+    },
+    "howHeading": "How it works",
+    "how": {
+      "1": {
+        "title": "Fill in the details",
+        "body": "Who is invoicing whom, the dates, the line items, and your payment details. Everything you type appears in the preview beside the form as you go, and your work is saved in your browser as a draft."
+      },
+      "2": {
+        "title": "Choose how it looks",
+        "body": "Open the template gallery to compare all fifteen layouts side by side with your own data in them, then set the colour, typeface and density."
+      },
+      "3": {
+        "title": "Print or export",
+        "body": "Print the invoice, save it from the print dialog, save it to reopen later \u2014 or use Bulk Export to turn a spreadsheet into a ZIP of finished PDFs."
+      }
+    },
+    "faqHeading": "Questions",
+    "faq": {
+      "1": {
+        "q": "Is FatahTech Invoice really free?",
+        "a": "Yes. There is no paid tier, no trial, and no account to create. The invoice generator, all fifteen templates, printing and bulk export are free to use."
+      },
+      "2": {
+        "q": "Do I need to sign up?",
+        "a": "No. Your invoice is held in your own browser while you work on it, and saved invoices stay in your browser's local storage. Nothing is stored on a server."
+      },
+      "3": {
+        "q": "Can I add my company logo?",
+        "a": "Yes. Upload an image on the invoice details step and it appears on fourteen of the fifteen templates. The Minimal template is deliberately logo-free."
+      },
+      "4": {
+        "q": "What currencies and languages are supported?",
+        "a": "Over a hundred and seventy currencies, formatted for the language you are using, and the interface is translated into eighteen languages. The invoice document itself is translated into thirteen of them."
+      },
+      "5": {
+        "q": "Can I edit an invoice after printing it?",
+        "a": "Yes. The preview stays live, so change any field and print again when you are ready. Bulk export reads the spreadsheet you uploaded, not the current form."
+      }
+    }
+  },
+  "clients": {
+    "emptyTooltip": "Save a client first to reuse it here",
+    "heading": "Saved clients",
+    "pick": "Clients",
+    "pickTooltip": "Fill these fields from a saved client",
+    "remove": "Remove",
+    "save": "Save client",
+    "saveTooltip": "Save this client to reuse on your next invoice",
+    "saved": "Saved"
+  },
+  "senders": {
+    "emptyTooltip": "Save your details first to reuse them here",
+    "heading": "Saved senders",
+    "pick": "Senders",
+    "pickTooltip": "Fill these fields from a saved sender",
+    "remove": "Remove",
+    "save": "Save sender",
+    "saveTooltip": "Save these details to reuse on your next invoice",
+    "saved": "Saved"
+  },
+  "bulkExport": {
+    "trigger": "Bulk Export",
+    "triggerTooltip": "Turn a CSV or Excel file into a ZIP of invoice PDFs",
+    "title": "Bulk export",
+    "description": "Upload a spreadsheet, map its columns, and download every invoice as a PDF in one ZIP. Everything happens in your browser.",
+    "steps": {
+      "upload": "Upload & templates",
+      "map": "Column mapping",
+      "style": "Style & template",
+      "preview": "Preview & export"
+    },
+    "nav": {
+      "back": "Back",
+      "next": "Continue",
+      "close": "Close",
+      "start": "Start Bulk Export",
+      "startAgain": "Start another batch",
+      "continue": "Continue"
+    },
+    "upload": {
+      "heading": "Upload a spreadsheet",
+      "description": "CSV, XLS or XLSX. Each row is a line item \u2014 rows with the same Invoice Number are grouped into one invoice with multiple items.",
+      "drop": "Choose a file or drop it here",
+      "hint": "Up to 15 MB \u00b7 10,000 rows \u00b7 500 invoices per batch",
+      "samples": "Need a starting point?",
+      "csv": "Download sample CSV",
+      "xlsx": "Download sample Excel",
+      "parsing": "Reading the file\u2026",
+      "detected": "{count} rows found in \u201c{sheet}\u201d.",
+      "replace": "Choose a different file",
+      "senderHint": "Sender address, logo, signature and bank details are inherited from the current invoice.",
+      "browse": "Browse files",
+      "supported": "CSV \u00b7 XLS \u00b7 XLSX",
+      "selected": "Selected file",
+      "sampleHeading": "Sample files",
+      "sampleBody": "Not sure where to start? Use one of these layouts and replace the rows.",
+      "sampleMeta": "3 invoices \u00b7 7 rows \u00b7 multiple line items",
+      "inheritHeading": "Inherited from the current invoice",
+      "inheritBody": "Sender address, logo, signature, bank details, payment terms and currency travel with every invoice in the batch.",
+      "parseFailed": "Could not read this file."
+    },
+    "map": {
+      "heading": "Map the columns",
+      "description": "Tell us which column holds each invoice field. Invoice Number is required because it groups multi-item invoices.",
+      "notMapped": "Not mapped",
+      "required": "Required",
+      "requiredMissing": "Map these fields to continue: {fields}",
+      "groupHint": "Grouping by Invoice Number produced {count} invoice(s).",
+      "issuesHeading": "Rows that need attention",
+      "noIssues": "No blocking issues found.",
+      "previewHeading": "First rows",
+      "column": "Column",
+      "sampleValue": "Sample value",
+      "requiredHeading": "Required fields",
+      "optionalHeading": "Optional fields",
+      "sourceHeading": "Source data",
+      "sourceHint": "Showing the first {count} rows",
+      "rows": "{count} rows",
+      "optionalHint": "Auto-mapped where possible. Expand to adjust.",
+      "mapped": "{count} mapped"
+    },
+    "style": {
+      "heading": "Choose the look",
+      "description": "These settings apply to every invoice in the batch.",
+      "template": "Template",
+      "font": "Font",
+      "density": "Density",
+      "accent": "Accent colour",
+      "customColor": "Custom colour",
+      "inheritHint": "Currency, payment terms and the invoice logo come from the current invoice.",
+      "templateHeading": "Invoice template",
+      "fontHeading": "Typeface",
+      "densityHeading": "Density",
+      "accentHeading": "Accent colour",
+      "appliesToAll": "Applied to every invoice in this batch."
+    },
+    "preview": {
+      "heading": "Check the first invoice",
+      "description": "This is a real A4 render of the first record in your file. Every invoice in the batch uses the same template and style.",
+      "invoices": "{count} invoices",
+      "items": "{count} line items",
+      "total": "Batch total: {total}",
+      "issuesHeading": "Rows that need attention",
+      "noInvoices": "No invoices could be built. Go back to the mapping step and check the required columns.",
+      "rendering": "Rendering the first invoice\u2026",
+      "summaryHeading": "Batch summary",
+      "readyHeading": "Ready to export",
+      "readyBody": "Each invoice is rendered in this tab and packed into a ZIP. Keep this tab open until it finishes.",
+      "completeHeading": "Export complete",
+      "failedHeading": "Export finished with issues",
+      "firstPage": "First invoice \u00b7 A4",
+      "sourceFile": "Source file",
+      "backToMapping": "Back to mapping",
+      "invoicesLabel": "Invoices",
+      "itemsLabel": "Line items",
+      "totalLabel": "Batch total"
+    },
+    "export": {
+      "heading": "Ready to export",
+      "description": "Each invoice is rendered to PDF in this browser tab, then packed into invoices_bulk_export.zip.",
+      "summary": "{count} invoice PDFs will be generated.",
+      "startHint": "This can take a few seconds per invoice. Keep this tab open.",
+      "progress": "Generating invoice {current} of {total}\u2026",
+      "packaging": "Packaging {count} PDFs into a ZIP\u2026",
+      "complete": "{count} invoice PDFs downloaded.",
+      "partial": "{done} of {total} exports succeeded. Failed: {failed}.",
+      "working": "Exporting\u2026"
+    },
+    "fields": {
+      "invoiceNumber": "Invoice Number",
+      "invoiceDate": "Invoice Date",
+      "dueDate": "Due Date",
+      "senderName": "Sender Name",
+      "senderEmail": "Sender Email",
+      "clientName": "Client Name",
+      "clientEmail": "Client Email",
+      "clientAddress": "Client Address",
+      "itemDescription": "Item Description",
+      "itemQuantity": "Item Quantity",
+      "itemRate": "Item Rate",
+      "taxRate": "Tax Rate (%)",
+      "discount": "Discount (%)",
+      "shipping": "Shipping"
+    },
+    "densities": {
+      "compact": "Compact",
+      "comfortable": "Comfortable",
+      "spacious": "Spacious"
+    },
+    "errors": {
+      "fileType": "Choose a .csv, .xls or .xlsx file.",
+      "noInvoices": "No invoices to export. Check the required mappings and the row issues.",
+      "renderFailed": "The ZIP could not be created.",
+      "allFailed": "Every invoice failed to render. Try a smaller file or a different template."
+    },
+    "stepOf": "Step {current} of {total}"
+  }
+}

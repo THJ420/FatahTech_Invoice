@@ -1,0 +1,8 @@
+InvoiceNumber,InvoiceDate,DueDate,SenderName,SenderEmail,ClientName,ClientEmail,ClientAddress,ItemDescription,ItemQuantity,ItemRate,TaxRate,Discount,Shipping
+INV-1001,2026-01-15,2026-02-14,FatahTech,billing@fatahtech.com,Acme Corp,ap@acme.com,"12 Market Street, London",Website redesign,1,2400,20,5,25
+,,,,,,,,Monthly hosting,12,25,20,5,25
+INV-1002,2026-02-01,2026-03-03,FatahTech,billing@fatahtech.com,Northwind Traders,finance@northwind.example,"88 Harbour Road, Manchester",Brand identity package,1,3200,20,0,0
+,,,,,,,,Stationery design,3,250,20,0,0
+,,,,,,,,Brand guidelines,1,600,20,0,0
+INV-1003,2026-02-10,2026-03-12,FatahTech,billing@fatahtech.com,Globex Industries,accounts@globex.example,"5 Science Park, Cambridge",Technical audit,1,1800,20,10,0
+,,,,,,,,Implementation sprint,2,950,20,10,0

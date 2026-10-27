@@ -1,0 +1,221 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    /*
+     * FatahTech palette.
+     *
+     * Borrowed from fatahtech.com: slate surfaces, a blue-600 primary and a
+     * cyan highlight. Light mode keeps the same accents on white so the product
+     * does not look like a different brand depending on the OS theme.
+     */
+    :root {
+        --background: 0 0% 100%;
+        /*
+         * The tinted ground the invoice paper floats on, in the preview pane.
+         * Deliberately its own token rather than --muted, which is already the
+         * resting fill of every input; the two need to move independently.
+         */
+        --ground: 210 40% 96.1%;
+        --foreground: 222.2 84% 4.9%;
+
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 84% 4.9%;
+
+        --popover: 0 0% 100%;
+        --popover-foreground: 222.2 84% 4.9%;
+
+        /* blue-600 */
+        --primary: 221.2 83.2% 53.3%;
+        --primary-foreground: 210 40% 98%;
+
+        --secondary: 210 40% 96.1%;
+        --secondary-foreground: 222.2 47.4% 11.2%;
+
+        --muted: 210 40% 96.1%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+
+        --accent: 204 94% 94%;
+        --accent-foreground: 201 96% 32%;
+
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+
+        --success: 152 62% 38%;
+        --success-foreground: 0 0% 100%;
+
+        --warning: 38 92% 48%;
+        --warning-foreground: 30 60% 12%;
+
+        --border: 214.3 31.8% 91.4%;
+        --input: 214.3 31.8% 91.4%;
+        --ring: 221.2 83.2% 53.3%;
+
+        /* cyan-500, used for brand gradients */
+        --brand-cyan: 188 94% 43%;
+
+        --radius: 0.75rem;
+    }
+
+    .dark {
+        /* slate-950 */
+        --background: 222.2 84% 4.9%;
+        /* Darker than the surface in dark mode, so the paper still lifts. */
+        --ground: 222 84% 3%;
+        --foreground: 210 40% 98%;
+
+        --card: 222.2 47.4% 8%;
+        --card-foreground: 210 40% 98%;
+
+        --popover: 222.2 47.4% 8%;
+        --popover-foreground: 210 40% 98%;
+
+        /* blue-600 stays the accent; it is already vivid on slate-950 */
+        --primary: 221.2 83.2% 53.3%;
+        --primary-foreground: 210 40% 98%;
+
+        /* slate-800 */
+        --secondary: 217.2 32.6% 17.5%;
+        --secondary-foreground: 210 40% 98%;
+
+        --muted: 217.2 32.6% 17.5%;
+        --muted-foreground: 215 20.2% 65.1%;
+
+        --accent: 199 89% 16%;
+        --accent-foreground: 187 92% 69%;
+
+        --destructive: 0 72% 51%;
+        --destructive-foreground: 210 40% 98%;
+
+        --success: 152 55% 46%;
+        --success-foreground: 152 80% 8%;
+
+        --warning: 38 90% 58%;
+        --warning-foreground: 30 60% 10%;
+
+        /* slate-800 */
+        --border: 217.2 32.6% 17.5%;
+        --input: 217.2 32.6% 20%;
+        --ring: 221.2 83.2% 60%;
+
+        --brand-cyan: 187 92% 69%;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+    }
+
+    /*
+     * The dark surface in the FatahTech site is lit from the top-right rather
+     * than flat black. Two very low-opacity radials recreate that without an
+     * image asset or a fixed-attachment (which repaints badly on mobile).
+     */
+    .dark body {
+        background-image: radial-gradient(
+                60rem 40rem at 110% -10%,
+                hsl(var(--primary) / 0.14),
+                transparent 60%
+            ),
+            radial-gradient(
+                42rem 30rem at -10% 8%,
+                hsl(var(--brand-cyan) / 0.08),
+                transparent 55%
+            );
+    }
+
+    /*
+     * Accessible focus: no ring for mouse users, a clear one for keyboard users.
+     * Replaces the previous blanket `:focus { outline: none }`, which removed
+     * focus indication for everyone.
+     */
+    :focus-visible {
+        @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+    }
+}
+
+@layer utilities {
+    /* Brand lockup: blue in light mode, blue-to-cyan on the dark surface. */
+    .brand-gradient {
+        color: hsl(var(--primary));
+    }
+
+    .dark .brand-gradient {
+        background-image: linear-gradient(
+            100deg,
+            hsl(217 91% 70%),
+            hsl(var(--brand-cyan))
+        );
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+
+    /* Respects the iOS home indicator / notch on the sticky mobile action bar. */
+    .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .mb-safe {
+        margin-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    /* Horizontal scrollers (stepper, template picker) without a visible bar. */
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* For Customized Calendar */
+.rdp-vhidden {
+    @apply hidden;
+}
+
+/*
+ * Click-to-edit affordance on the live preview.
+ *
+ * Scoped to `.invoice-live-preview`, so the identical template markup rendered
+ * into the PDF or into a gallery miniature stays completely inert. The parts
+ * carry `data-edit-field` attributes naming the form field behind them; see
+ * app/components/invoice/actions/LivePreview.tsx
+ */
+.invoice-live-preview [data-edit-field] {
+    cursor: pointer;
+    border-radius: 0.375rem;
+    /* Outline rather than border, so nothing shifts when it appears. */
+    outline: 2px solid transparent;
+    outline-offset: 3px;
+    transition:
+        outline-color 120ms ease,
+        background-color 120ms ease;
+}
+
+.invoice-live-preview [data-edit-field]:hover {
+    outline-color: hsl(var(--primary) / 0.5);
+    background-color: hsl(var(--primary) / 0.04);
+}
+
+/* A nested region should not also light up its parent. */
+.invoice-live-preview [data-edit-field]:hover [data-edit-field]:not(:hover) {
+    outline-color: transparent;
+    background-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .invoice-live-preview [data-edit-field] {
+        transition: none;
+    }
+}
