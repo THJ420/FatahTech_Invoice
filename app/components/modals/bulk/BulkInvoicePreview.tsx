@@ -111,7 +111,7 @@ const BulkInvoicePreview = ({
             className={cn(
                 "relative w-full overflow-hidden rounded-lg border border-border",
                 fit === "contain"
-                    ? "flex items-center justify-center bg-slate-950/40"
+                    ? "flex items-center justify-center bg-muted/40"
                     : "mx-auto bg-white",
                 className
             )}
@@ -143,7 +143,7 @@ const BulkInvoicePreview = ({
                     className={cn(
                         "flex items-center justify-center p-6 text-center text-sm",
                         fit === "contain"
-                            ? "h-full w-full text-slate-400"
+                            ? "h-full w-full text-muted-foreground"
                             : "h-full text-muted-foreground"
                     )}
                 >

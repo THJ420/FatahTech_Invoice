@@ -139,7 +139,14 @@ const formatCell = (value: unknown): string => {
     return text.trim() || "—";
 };
 
-function DarkSelectContent({
+/**
+ * The mapping dropdowns.
+ *
+ * Wraps `SelectContent` only to pin the side offset, the collision padding and
+ * a scrollable viewport; the colours come from the popover tokens, so the menu
+ * matches whichever theme is active.
+ */
+function SelectMenuContent({
     className,
     ...props
 }: ComponentProps<typeof SelectContent>) {
@@ -150,7 +157,7 @@ function DarkSelectContent({
             collisionPadding={12}
             viewportClassName="h-auto max-h-72 overflow-y-auto"
             className={cn(
-                "dark border-slate-800 bg-[#0b1324] text-slate-100 shadow-2xl",
+                "border-border bg-popover text-popover-foreground shadow-2xl",
                 className
             )}
         />
@@ -168,14 +175,14 @@ function StepHeader({
 }) {
     return (
         <div className="flex items-start gap-3.5">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10 text-blue-400">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary">
                 <Icon className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-                <h3 className="text-lg font-semibold tracking-tight text-slate-50 sm:text-xl">
+                <h3 className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
                     {title}
                 </h3>
-                <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-400">
+                <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">
                     {description}
                 </p>
             </div>
@@ -202,7 +209,7 @@ function MappingSelect({
             <div className="flex items-center justify-between gap-2">
                 <Label
                     htmlFor={`bulk-map-${field.key}`}
-                    className="text-xs font-medium text-slate-300"
+                    className="text-xs font-medium text-foreground/80"
                 >
                     {_t(`bulkExport.fields.${field.key}`)}
                 </Label>
@@ -211,8 +218,8 @@ function MappingSelect({
                         className={cn(
                             "rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider",
                             missing
-                                ? "bg-amber-500/15 text-amber-300"
-                                : "bg-slate-800 text-slate-500"
+                                ? "bg-amber-500/15 text-amber-700 dark:text-amber-300"
+                                : "bg-muted text-muted-foreground"
                         )}
                     >
                         {_t("bulkExport.map.required")}
@@ -229,13 +236,13 @@ function MappingSelect({
                 <SelectTrigger
                     id={`bulk-map-${field.key}`}
                     className={cn(
-                        "h-10 w-full border-slate-700/80 bg-slate-950/60 text-sm text-slate-100 hover:border-blue-500/50 focus:ring-blue-500/40",
+                        "h-10 w-full border-border bg-muted/60 text-sm text-foreground hover:border-primary/50 focus:ring-ring/40",
                         missing && "border-amber-500/60"
                     )}
                 >
                     <SelectValue placeholder={_t("bulkExport.map.notMapped")} />
                 </SelectTrigger>
-                <DarkSelectContent>
+                <SelectMenuContent>
                     <SelectItem value={NOT_MAPPED}>
                         {_t("bulkExport.map.notMapped")}
                     </SelectItem>
@@ -243,12 +250,12 @@ function MappingSelect({
                         <SelectItem
                             key={header}
                             value={header}
-                            className="focus:bg-slate-800 focus:text-white"
+                            className="focus:bg-muted focus:text-foreground"
                         >
                             {header}
                         </SelectItem>
                     ))}
-                </DarkSelectContent>
+                </SelectMenuContent>
             </Select>
         </div>
     );
@@ -276,13 +283,15 @@ function IssueList({
             <p
                 className={cn(
                     "flex items-center gap-2 text-xs font-semibold",
-                    hasError ? "text-rose-300" : "text-amber-300"
+                    hasError
+                        ? "text-rose-700 dark:text-rose-300"
+                        : "text-amber-700 dark:text-amber-300"
                 )}
             >
                 <AlertTriangle className="h-3.5 w-3.5" />
                 {heading}
             </p>
-            <ul className="mt-2 space-y-1 text-[11px] leading-relaxed text-slate-400">
+            <ul className="mt-2 space-y-1 text-[11px] leading-relaxed text-muted-foreground">
                 {shown.map((issue, index) => (
                     <li key={`${issue.row}-${index}`}>
                         Row {issue.row}: {issue.message}
@@ -298,11 +307,11 @@ function IssueList({
 
 function Metric({ label, value }: { label: string; value: string | number }) {
     return (
-        <div className="rounded-lg border border-slate-800/80 bg-slate-950/40 px-3 py-2.5">
-            <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
+        <div className="rounded-lg border border-border bg-muted/40 px-3 py-2.5">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                 {label}
             </p>
-            <p className="mt-1 text-sm font-semibold tabular-nums text-slate-100">
+            <p className="mt-1 text-sm font-semibold tabular-nums text-foreground">
                 {value}
             </p>
         </div>
@@ -691,9 +700,14 @@ const BulkExportModal = ({
         <Dialog open={open} onOpenChange={handleOpenChange}>
             {children && <DialogTrigger asChild>{children}</DialogTrigger>}
 
+            {/*
+             * No `dark` class and no forced dark scrim: this used to be a dark
+             * panel inside a `dark` subtree, which meant the bulk exporter
+             * stayed dark in a light session. Everything below is built from
+             * theme tokens now, so the modal follows the app's mode.
+             */}
             <DialogContent
-                overlayClassName="bg-slate-950/75 backdrop-blur-[2px]"
-                className="dark flex max-h-[94dvh] w-[calc(100vw-1rem)] max-w-6xl flex-col gap-0 overflow-hidden border-slate-800 bg-[#050b16] p-0 text-slate-50 shadow-2xl [&>button]:text-slate-400 [&>button]:hover:text-white sm:max-h-[92dvh] sm:w-[calc(100vw-3rem)] sm:rounded-2xl md:w-[calc(100vw-3rem)]"
+                className="flex max-h-[94dvh] w-[calc(100vw-1rem)] max-w-6xl flex-col gap-0 overflow-hidden border-border bg-card p-0 text-card-foreground shadow-2xl [&>button]:text-muted-foreground [&>button]:hover:text-foreground sm:max-h-[92dvh] sm:w-[calc(100vw-3rem)] sm:rounded-2xl md:w-[calc(100vw-3rem)]"
                 onPointerDownOutside={(event) => {
                     if (progress.running) event.preventDefault();
                 }}
@@ -702,17 +716,17 @@ const BulkExportModal = ({
                 }}
             >
                 {/* Header and step rail stay fixed while the step scrolls. */}
-                <div className="shrink-0 border-b border-slate-800/80 bg-gradient-to-br from-blue-500/[0.08] via-transparent to-cyan-400/[0.05] px-5 pb-4 pt-5 sm:px-8 sm:pb-5 sm:pt-7">
+                <div className="shrink-0 border-b border-border bg-gradient-to-br from-primary/[0.08] via-transparent to-cyan-400/[0.05] px-5 pb-4 pt-5 sm:px-8 sm:pb-5 sm:pt-7">
                     <DialogHeader className="pe-10 text-start">
                         <div className="flex items-start gap-3.5">
-                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-blue-500/25 bg-blue-500/15 text-blue-300">
+                            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/25 bg-primary/15 text-primary">
                                 <FileArchive className="h-5 w-5" />
                             </span>
                             <div className="min-w-0">
-                                <DialogTitle className="text-lg font-semibold tracking-tight text-slate-50 sm:text-xl">
+                                <DialogTitle className="text-lg font-semibold tracking-tight text-foreground sm:text-xl">
                                     {_t("bulkExport.title")}
                                 </DialogTitle>
-                                <DialogDescription className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-400">
+                                <DialogDescription className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">
                                     {_t("bulkExport.description")}
                                 </DialogDescription>
                             </div>
@@ -721,13 +735,13 @@ const BulkExportModal = ({
 
                     <div className="mt-5 sm:hidden">
                         <div className="flex items-center justify-between gap-3">
-                            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                                 {_t("bulkExport.stepOf", {
                                     current: currentIndex + 1,
                                     total: STEPS.length,
                                 })}
                             </p>
-                            <p className="truncate text-xs font-medium text-slate-200">
+                            <p className="truncate text-xs font-medium text-foreground">
                                 {currentStepLabel}
                             </p>
                         </div>
@@ -738,8 +752,8 @@ const BulkExportModal = ({
                                     className={cn(
                                         "h-1 rounded-full transition-colors",
                                         index <= currentIndex
-                                            ? "bg-gradient-to-r from-blue-500 to-cyan-400"
-                                            : "bg-slate-800"
+                                            ? "bg-gradient-to-r from-primary to-cyan-400"
+                                            : "bg-muted"
                                     )}
                                 />
                             ))}
@@ -768,10 +782,10 @@ const BulkExportModal = ({
                                                 className={cn(
                                                     "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold transition-colors",
                                                     active
-                                                        ? "border-blue-500 bg-blue-500 text-white"
+                                                        ? "border-primary bg-primary text-primary-foreground"
                                                         : complete
-                                                          ? "border-cyan-400/30 bg-cyan-400/10 text-cyan-300"
-                                                          : "border-slate-700 bg-slate-900/40 text-slate-500"
+                                                          ? "border-cyan-400/30 bg-cyan-400/10 text-cyan-600 dark:text-cyan-400"
+                                                          : "border-border bg-muted/40 text-muted-foreground"
                                                 )}
                                             >
                                                 {complete ? (
@@ -784,21 +798,21 @@ const BulkExportModal = ({
                                                 className={cn(
                                                     "truncate text-xs font-medium",
                                                     active
-                                                        ? "text-slate-100"
+                                                        ? "text-foreground"
                                                         : reachable
-                                                          ? "text-slate-400"
-                                                          : "text-slate-600"
+                                                          ? "text-muted-foreground"
+                                                          : "text-muted-foreground/60"
                                                 )}
                                             >
                                                 {_t(`bulkExport.steps.${item}`)}
                                             </span>
                                         </span>
-                                        <span className="mt-3 block h-1 overflow-hidden rounded-full bg-slate-800">
+                                        <span className="mt-3 block h-1 overflow-hidden rounded-full bg-muted">
                                             <span
                                                 className={cn(
                                                     "block h-full rounded-full transition-all duration-300",
                                                     complete || active
-                                                        ? "w-full bg-gradient-to-r from-blue-500 to-cyan-400"
+                                                        ? "w-full bg-gradient-to-r from-primary to-cyan-400"
                                                         : "w-0"
                                                 )}
                                             />
@@ -840,44 +854,44 @@ const BulkExportModal = ({
                                         }
                                         onDrop={handleDrop}
                                         className={cn(
-                                            "flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 px-6 py-10 text-center transition-colors hover:border-blue-500/60 hover:bg-blue-500/[0.04] focus-within:ring-2 focus-within:ring-blue-500/40",
+                                            "flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/40 px-6 py-10 text-center transition-colors hover:border-primary/60 hover:bg-primary/[0.04] focus-within:ring-2 focus-within:ring-ring/40",
                                             parsing &&
                                                 "pointer-events-none opacity-70"
                                         )}
                                     >
-                                        <span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/20 to-cyan-400/10 text-blue-300">
+                                        <span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/20 to-cyan-400/10 text-primary">
                                             {parsing ? (
                                                 <Loader2 className="h-6 w-6 animate-spin" />
                                             ) : (
                                                 <UploadCloud className="h-6 w-6" />
                                             )}
                                         </span>
-                                        <span className="mt-4 text-base font-semibold text-slate-100">
+                                        <span className="mt-4 text-base font-semibold text-foreground">
                                             {parsing
                                                 ? _t(
                                                       "bulkExport.upload.parsing"
                                                   )
                                                 : _t("bulkExport.upload.drop")}
                                         </span>
-                                        <span className="mt-1 max-w-md text-sm leading-relaxed text-slate-400">
+                                        <span className="mt-1 max-w-md text-sm leading-relaxed text-muted-foreground">
                                             {_t("bulkExport.upload.hint")}
                                         </span>
-                                        <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-slate-700/80 bg-slate-950/60 px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-slate-400">
+                                        <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/60 px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                                             {_t("bulkExport.upload.supported")}
                                         </span>
                                     </label>
 
                                     {sheet && (
-                                        <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-800 bg-slate-900/60 p-3">
+                                        <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-muted/60 p-3">
                                             <div className="flex min-w-0 items-center gap-3">
-                                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-400">
+                                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                                     <FileSpreadsheet className="h-4 w-4" />
                                                 </span>
                                                 <div className="min-w-0">
-                                                    <p className="truncate text-sm font-medium text-slate-100">
+                                                    <p className="truncate text-sm font-medium text-foreground">
                                                         {sheet.fileName}
                                                     </p>
-                                                    <p className="text-[11px] text-slate-500">
+                                                    <p className="text-[11px] text-muted-foreground">
                                                         {_t(
                                                             "bulkExport.map.rows",
                                                             {
@@ -900,7 +914,7 @@ const BulkExportModal = ({
                                                 onClick={() =>
                                                     fileInputRef.current?.click()
                                                 }
-                                                className="shrink-0 border-slate-700 bg-slate-950/40 text-slate-200 hover:bg-slate-800"
+                                                className="shrink-0 border-border bg-muted/40 text-foreground hover:bg-muted"
                                             >
                                                 {_t(
                                                     "bulkExport.upload.replace"
@@ -912,7 +926,7 @@ const BulkExportModal = ({
                                     {fileError && (
                                         <div
                                             role="alert"
-                                            className="flex items-start gap-2 rounded-xl border border-rose-500/25 bg-rose-500/5 p-3 text-sm text-rose-300"
+                                            className="flex items-start gap-2 rounded-xl border border-rose-500/25 bg-rose-500/5 p-3 text-sm text-rose-700 dark:text-rose-300"
                                         >
                                             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                                             {fileError}
@@ -921,16 +935,16 @@ const BulkExportModal = ({
                                 </div>
 
                                 <div className="space-y-3">
-                                    <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+                                    <div className="rounded-2xl border border-border bg-muted/50 p-4">
                                         <div className="flex items-center gap-2">
-                                            <Download className="h-4 w-4 text-blue-400" />
-                                            <h4 className="text-sm font-semibold text-slate-100">
+                                            <Download className="h-4 w-4 text-primary" />
+                                            <h4 className="text-sm font-semibold text-foreground">
                                                 {_t(
                                                     "bulkExport.upload.sampleHeading"
                                                 )}
                                             </h4>
                                         </div>
-                                        <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                                        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                                             {_t("bulkExport.upload.sampleBody")}
                                         </p>
 
@@ -951,38 +965,38 @@ const BulkExportModal = ({
                                                     key={sample.href}
                                                     href={sample.href}
                                                     download
-                                                    className="group flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/40 p-3 transition-colors hover:border-blue-500/40 hover:bg-slate-900"
+                                                    className="group flex items-center gap-3 rounded-xl border border-border bg-muted/40 p-3 transition-colors hover:border-primary/40 hover:bg-muted"
                                                 >
-                                                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-800/80 text-slate-300">
+                                                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted text-foreground/80">
                                                         <FileSpreadsheet className="h-4 w-4" />
                                                     </span>
                                                     <span className="min-w-0 flex-1">
-                                                        <span className="block truncate text-xs font-medium text-slate-200">
+                                                        <span className="block truncate text-xs font-medium text-foreground">
                                                             {sample.name}
                                                         </span>
-                                                        <span className="mt-0.5 block text-[10px] text-slate-500">
+                                                        <span className="mt-0.5 block text-[10px] text-muted-foreground">
                                                             {sample.kind} ·{" "}
                                                             {_t(
                                                                 "bulkExport.upload.sampleMeta"
                                                             )}
                                                         </span>
                                                     </span>
-                                                    <Download className="h-3.5 w-3.5 shrink-0 text-slate-500 transition-colors group-hover:text-blue-400" />
+                                                    <Download className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-colors group-hover:text-primary" />
                                                 </a>
                                             ))}
                                         </div>
                                     </div>
 
-                                    <div className="rounded-2xl border border-blue-500/15 bg-blue-500/[0.04] p-4">
+                                    <div className="rounded-2xl border border-primary/15 bg-primary/[0.04] p-4">
                                         <div className="flex items-center gap-2">
-                                            <ShieldCheck className="h-4 w-4 text-cyan-300" />
-                                            <h4 className="text-sm font-semibold text-slate-100">
+                                            <ShieldCheck className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+                                            <h4 className="text-sm font-semibold text-foreground">
                                                 {_t(
                                                     "bulkExport.upload.inheritHeading"
                                                 )}
                                             </h4>
                                         </div>
-                                        <p className="mt-1.5 text-xs leading-relaxed text-slate-400">
+                                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
                                             {_t(
                                                 "bulkExport.upload.inheritBody"
                                             )}
@@ -1004,7 +1018,7 @@ const BulkExportModal = ({
                             {missingRequired.length > 0 ? (
                                 <div
                                     role="alert"
-                                    className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200"
+                                    className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-700 dark:text-amber-200"
                                 >
                                     <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                                     {_t("bulkExport.map.requiredMissing", {
@@ -1016,7 +1030,7 @@ const BulkExportModal = ({
                                     })}
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-3 text-sm text-emerald-200">
+                                <div className="flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-3 text-sm text-emerald-800 dark:text-emerald-200">
                                     <CheckCircle2 className="h-4 w-4 shrink-0" />
                                     {_t("bulkExport.map.groupHint", {
                                         count: built.invoices.length,
@@ -1024,12 +1038,12 @@ const BulkExportModal = ({
                                 </div>
                             )}
 
-                            <div className="rounded-2xl border border-blue-500/20 bg-blue-500/[0.04] p-4">
+                            <div className="rounded-2xl border border-primary/20 bg-primary/[0.04] p-4">
                                 <div className="flex items-center justify-between gap-3">
-                                    <h4 className="text-sm font-semibold text-slate-100">
+                                    <h4 className="text-sm font-semibold text-foreground">
                                         {_t("bulkExport.map.requiredHeading")}
                                     </h4>
-                                    <span className="rounded-full bg-blue-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-blue-300">
+                                    <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
                                         {requiredFields.length}
                                     </span>
                                 </div>
@@ -1053,26 +1067,26 @@ const BulkExportModal = ({
 
                             <div
                                 ref={optionalFieldsRef}
-                                className="rounded-2xl border border-slate-800 bg-slate-900/50"
+                                className="rounded-2xl border border-border bg-muted/50"
                             >
                                 <button
                                     type="button"
                                     onClick={toggleOptionalFields}
                                     aria-expanded={optionalExpanded}
-                                    className="flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-slate-800/30"
+                                    className="flex w-full items-center justify-between gap-3 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-muted/60"
                                 >
                                     <div>
-                                        <h4 className="text-sm font-semibold text-slate-100">
+                                        <h4 className="text-sm font-semibold text-foreground">
                                             {_t(
                                                 "bulkExport.map.optionalHeading"
                                             )}
                                         </h4>
-                                        <p className="mt-0.5 text-[11px] text-slate-500">
+                                        <p className="mt-0.5 text-[11px] text-muted-foreground">
                                             {_t("bulkExport.map.optionalHint")}
                                         </p>
                                     </div>
                                     <div className="flex shrink-0 items-center gap-2">
-                                        <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-400">
+                                        <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
                                             {_t("bulkExport.map.mapped", {
                                                 count: optionalMapped,
                                             })}
@@ -1081,7 +1095,7 @@ const BulkExportModal = ({
                                         </span>
                                         <ChevronDown
                                             className={cn(
-                                                "h-4 w-4 text-slate-500 transition-transform",
+                                                "h-4 w-4 text-muted-foreground transition-transform",
                                                 optionalExpanded && "rotate-180"
                                             )}
                                         />
@@ -1089,7 +1103,7 @@ const BulkExportModal = ({
                                 </button>
 
                                 {optionalExpanded && (
-                                    <div className="border-t border-slate-800/80 p-4">
+                                    <div className="border-t border-border p-4">
                                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                                             {optionalFields.map((field) => (
                                                 <MappingSelect
@@ -1113,15 +1127,15 @@ const BulkExportModal = ({
                                 )}
                             </div>
 
-                            <div className="rounded-2xl border border-slate-800 bg-slate-900/50">
-                                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 px-4 py-3">
+                            <div className="rounded-2xl border border-border bg-muted/50">
+                                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
                                     <div className="flex items-center gap-2">
-                                        <Table2 className="h-4 w-4 text-blue-400" />
-                                        <h4 className="text-sm font-semibold text-slate-100">
+                                        <Table2 className="h-4 w-4 text-primary" />
+                                        <h4 className="text-sm font-semibold text-foreground">
                                             {_t("bulkExport.map.sourceHeading")}
                                         </h4>
                                     </div>
-                                    <span className="text-[11px] text-slate-500">
+                                    <span className="text-[11px] text-muted-foreground">
                                         {_t("bulkExport.map.sourceHint", {
                                             count: Math.min(
                                                 4,
@@ -1132,12 +1146,12 @@ const BulkExportModal = ({
                                 </div>
                                 <div className="max-h-64 overflow-auto">
                                     <table className="w-full min-w-[44rem] border-collapse text-[11px]">
-                                        <thead className="sticky top-0 z-10 bg-[#0b1324]">
+                                        <thead className="sticky top-0 z-10 bg-muted">
                                             <tr>
                                                 {sheet.headers.map((header) => (
                                                     <th
                                                         key={header}
-                                                        className="whitespace-nowrap border-b border-slate-800 px-3 py-2.5 text-start font-medium text-slate-400"
+                                                        className="whitespace-nowrap border-b border-border px-3 py-2.5 text-start font-medium text-muted-foreground"
                                                     >
                                                         {header}
                                                     </th>
@@ -1150,13 +1164,13 @@ const BulkExportModal = ({
                                                 .map((row, rowIndex) => (
                                                     <tr
                                                         key={rowIndex}
-                                                        className="border-b border-slate-800/60 last:border-0 hover:bg-slate-800/30"
+                                                        className="border-b border-border last:border-0 hover:bg-muted/60"
                                                     >
                                                         {sheet.headers.map(
                                                             (header) => (
                                                                 <td
                                                                     key={header}
-                                                                    className="max-w-[14rem] truncate whitespace-nowrap px-3 py-2 text-slate-400"
+                                                                    className="max-w-[14rem] truncate whitespace-nowrap px-3 py-2 text-muted-foreground"
                                                                 >
                                                                     {formatCell(
                                                                         row[
@@ -1190,12 +1204,12 @@ const BulkExportModal = ({
                                 description={_t("bulkExport.style.description")}
                             />
 
-                            <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+                            <div className="rounded-2xl border border-border bg-muted/50 p-4">
                                 <div className="flex items-center justify-between gap-3">
-                                    <h4 className="text-sm font-semibold text-slate-100">
+                                    <h4 className="text-sm font-semibold text-foreground">
                                         {_t("bulkExport.style.templateHeading")}
                                     </h4>
-                                    <span className="text-[11px] text-slate-500">
+                                    <span className="text-[11px] text-muted-foreground">
                                         {selectedTemplate.name}
                                     </span>
                                 </div>
@@ -1219,24 +1233,24 @@ const BulkExportModal = ({
                                                 className={cn(
                                                     "group relative rounded-xl border p-3 text-left transition-colors",
                                                     active
-                                                        ? "border-blue-500/70 bg-blue-500/10"
-                                                        : "border-slate-800 bg-slate-950/40 hover:border-slate-700 hover:bg-slate-900/70"
+                                                        ? "border-primary/70 bg-primary/10"
+                                                        : "border-border bg-muted/40 hover:border-border hover:bg-muted/70"
                                                 )}
                                             >
                                                 <span className="flex items-center justify-between">
-                                                    <span className="font-mono text-[10px] text-slate-500">
+                                                    <span className="font-mono text-[10px] text-muted-foreground">
                                                         {String(
                                                             template.id
                                                         ).padStart(2, "0")}
                                                     </span>
                                                     {active && (
-                                                        <Check className="h-3.5 w-3.5 text-blue-400" />
+                                                        <Check className="h-3.5 w-3.5 text-primary" />
                                                     )}
                                                 </span>
-                                                <span className="mt-2 block text-xs font-semibold text-slate-100">
+                                                <span className="mt-2 block text-xs font-semibold text-foreground">
                                                     {template.name}
                                                 </span>
-                                                <span className="mt-0.5 line-clamp-2 block text-[10px] leading-relaxed text-slate-500">
+                                                <span className="mt-0.5 line-clamp-2 block text-[10px] leading-relaxed text-muted-foreground">
                                                     {template.description}
                                                 </span>
                                             </button>
@@ -1246,8 +1260,8 @@ const BulkExportModal = ({
                             </div>
 
                             <div className="grid gap-4 lg:grid-cols-3">
-                                <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
-                                    <h4 className="text-sm font-semibold text-slate-100">
+                                <div className="rounded-2xl border border-border bg-muted/50 p-4">
+                                    <h4 className="text-sm font-semibold text-foreground">
                                         {_t("bulkExport.style.fontHeading")}
                                     </h4>
                                     <div className="mt-3 grid grid-cols-2 gap-2">
@@ -1271,12 +1285,12 @@ const BulkExportModal = ({
                                                     className={cn(
                                                         "rounded-xl border p-3 text-left transition-colors",
                                                         active
-                                                            ? "border-blue-500/70 bg-blue-500/10"
-                                                            : "border-slate-800 bg-slate-950/40 hover:border-slate-700"
+                                                            ? "border-primary/70 bg-primary/10"
+                                                            : "border-border bg-muted/40 hover:border-border"
                                                     )}
                                                 >
                                                     <span
-                                                        className="block text-2xl leading-none text-slate-100"
+                                                        className="block text-2xl leading-none text-foreground"
                                                         style={{
                                                             fontFamily:
                                                                 font.stack,
@@ -1284,7 +1298,7 @@ const BulkExportModal = ({
                                                     >
                                                         Aa
                                                     </span>
-                                                    <span className="mt-2 block text-[11px] font-medium text-slate-300">
+                                                    <span className="mt-2 block text-[11px] font-medium text-foreground/80">
                                                         {font.name}
                                                     </span>
                                                 </button>
@@ -1293,11 +1307,11 @@ const BulkExportModal = ({
                                     </div>
                                 </div>
 
-                                <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
-                                    <h4 className="text-sm font-semibold text-slate-100">
+                                <div className="rounded-2xl border border-border bg-muted/50 p-4">
+                                    <h4 className="text-sm font-semibold text-foreground">
                                         {_t("bulkExport.style.densityHeading")}
                                     </h4>
-                                    <div className="mt-3 space-y-1.5 rounded-xl border border-slate-800 bg-slate-950/40 p-1">
+                                    <div className="mt-3 space-y-1.5 rounded-xl border border-border bg-muted/40 p-1">
                                         {DENSITIES.map((density) => {
                                             const active =
                                                 density === style.density;
@@ -1318,15 +1332,15 @@ const BulkExportModal = ({
                                                     className={cn(
                                                         "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-medium transition-colors",
                                                         active
-                                                            ? "bg-slate-800 text-slate-100 shadow-sm"
-                                                            : "text-slate-400 hover:bg-slate-900 hover:text-slate-200"
+                                                            ? "bg-muted text-foreground shadow-sm"
+                                                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
                                                     )}
                                                 >
                                                     {_t(
                                                         `bulkExport.densities.${density}`
                                                     )}
                                                     {active && (
-                                                        <Check className="h-3.5 w-3.5 text-blue-400" />
+                                                        <Check className="h-3.5 w-3.5 text-primary" />
                                                     )}
                                                 </button>
                                             );
@@ -1334,14 +1348,14 @@ const BulkExportModal = ({
                                     </div>
                                 </div>
 
-                                <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+                                <div className="rounded-2xl border border-border bg-muted/50 p-4">
                                     <div className="flex items-center justify-between gap-2">
-                                        <h4 className="text-sm font-semibold text-slate-100">
+                                        <h4 className="text-sm font-semibold text-foreground">
                                             {_t(
                                                 "bulkExport.style.accentHeading"
                                             )}
                                         </h4>
-                                        <span className="rounded-md border border-slate-800 bg-slate-950/60 px-2 py-0.5 font-mono text-[10px] uppercase text-slate-400">
+                                        <span className="rounded-md border border-border bg-muted/60 px-2 py-0.5 font-mono text-[10px] uppercase text-muted-foreground">
                                             {style.accentColor}
                                         </span>
                                     </div>
@@ -1365,9 +1379,18 @@ const BulkExportModal = ({
                                                 }
                                                 className={cn(
                                                     "h-8 w-8 rounded-full border-2 ring-1 ring-inset ring-black/20 transition-transform hover:scale-105 dark:ring-white/20",
+                                                    /*
+                                                     * `border-foreground`, not
+                                                     * `border-white`: the
+                                                     * selected swatch needs a
+                                                     * ring that contrasts with
+                                                     * the panel, and a white one
+                                                     * disappears on a white
+                                                     * panel.
+                                                     */
                                                     style.accentColor ===
                                                         preset.value
-                                                        ? "border-white"
+                                                        ? "border-foreground"
                                                         : "border-transparent"
                                                 )}
                                                 style={{
@@ -1377,12 +1400,12 @@ const BulkExportModal = ({
                                             />
                                         ))}
                                         <label
-                                            className="relative flex h-8 w-8 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-dashed border-slate-600 bg-slate-950/60"
+                                            className="relative flex h-8 w-8 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-dashed border-border bg-muted/60"
                                             title={_t(
                                                 "bulkExport.style.customColor"
                                             )}
                                         >
-                                            <Palette className="h-3.5 w-3.5 text-slate-300" />
+                                            <Palette className="h-3.5 w-3.5 text-foreground/80" />
                                             <input
                                                 type="color"
                                                 value={style.accentColor}
@@ -1400,14 +1423,14 @@ const BulkExportModal = ({
                                             />
                                         </label>
                                     </div>
-                                    <p className="mt-4 text-[11px] leading-relaxed text-slate-500">
+                                    <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
                                         {_t("bulkExport.style.appliesToAll")}
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="flex items-start gap-2 rounded-xl border border-slate-800 bg-slate-900/40 p-3 text-xs text-slate-400">
-                                <Info className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />
+                            <div className="flex items-start gap-2 rounded-xl border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+                                <Info className="mt-0.5 h-4 w-4 shrink-0 text-cyan-600 dark:text-cyan-400" />
                                 {_t("bulkExport.style.inheritHint")}
                             </div>
                         </div>
@@ -1425,14 +1448,14 @@ const BulkExportModal = ({
 
                             {built.invoices.length > 0 ? (
                                 <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_21rem]">
-                                    <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-3 sm:p-4">
+                                    <div className="rounded-2xl border border-border bg-muted/40 p-3 sm:p-4">
                                         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                                            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                            <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                                                 {_t(
                                                     "bulkExport.preview.firstPage"
                                                 )}
                                             </p>
-                                            <span className="rounded-full border border-slate-700/80 bg-slate-950/60 px-2.5 py-0.5 text-[10px] font-medium text-slate-400">
+                                            <span className="rounded-full border border-border bg-muted/60 px-2.5 py-0.5 text-[10px] font-medium text-muted-foreground">
                                                 {selectedTemplate.name}
                                             </span>
                                         </div>
@@ -1446,10 +1469,10 @@ const BulkExportModal = ({
                                     </div>
 
                                     <div className="space-y-3">
-                                        <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+                                        <div className="rounded-2xl border border-border bg-muted/50 p-4">
                                             <div className="flex items-center gap-2">
-                                                <FileSpreadsheet className="h-4 w-4 shrink-0 text-blue-400" />
-                                                <p className="min-w-0 truncate text-xs font-medium text-slate-300">
+                                                <FileSpreadsheet className="h-4 w-4 shrink-0 text-primary" />
+                                                <p className="min-w-0 truncate text-xs font-medium text-foreground/80">
                                                     {sheet?.fileName}
                                                 </p>
                                             </div>
@@ -1481,21 +1504,21 @@ const BulkExportModal = ({
                                         </div>
 
                                         {!result && !progress.running && (
-                                            <div className="rounded-2xl border border-blue-500/20 bg-blue-500/[0.05] p-4">
+                                            <div className="rounded-2xl border border-primary/20 bg-primary/[0.05] p-4">
                                                 <div className="flex items-center gap-2">
-                                                    <Sparkles className="h-4 w-4 text-cyan-300" />
-                                                    <h4 className="text-sm font-semibold text-slate-100">
+                                                    <Sparkles className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+                                                    <h4 className="text-sm font-semibold text-foreground">
                                                         {_t(
                                                             "bulkExport.preview.readyHeading"
                                                         )}
                                                     </h4>
                                                 </div>
-                                                <p className="mt-1.5 text-xs leading-relaxed text-slate-400">
+                                                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
                                                     {_t(
                                                         "bulkExport.preview.readyBody"
                                                     )}
                                                 </p>
-                                                <p className="mt-3 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-slate-500">
+                                                <p className="mt-3 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                                                     <FileArchive className="h-3.5 w-3.5" />
                                                     invoices_bulk_export.zip
                                                 </p>
@@ -1503,18 +1526,18 @@ const BulkExportModal = ({
                                         )}
 
                                         {(progress.running || result) && (
-                                            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+                                            <div className="rounded-2xl border border-border bg-muted/60 p-4">
                                                 <div className="flex items-center justify-between gap-3">
-                                                    <p className="flex items-center gap-2 text-xs font-semibold text-slate-200">
+                                                    <p className="flex items-center gap-2 text-xs font-semibold text-foreground">
                                                         {result ? (
                                                             result.failed
                                                                 .length > 0 ? (
-                                                                <AlertTriangle className="h-4 w-4 text-amber-300" />
+                                                                <AlertTriangle className="h-4 w-4 text-amber-700 dark:text-amber-300" />
                                                             ) : (
-                                                                <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                                                                <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                                                             )
                                                         ) : (
-                                                            <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
+                                                            <Loader2 className="h-4 w-4 animate-spin text-primary" />
                                                         )}
                                                         {result
                                                             ? result.failed
@@ -1527,18 +1550,18 @@ const BulkExportModal = ({
                                                                   )
                                                             : progressLabel}
                                                     </p>
-                                                    <span className="text-xs font-medium tabular-nums text-slate-400">
+                                                    <span className="text-xs font-medium tabular-nums text-muted-foreground">
                                                         {progressValue}%
                                                     </span>
                                                 </div>
                                                 <Progress
                                                     value={progressValue}
-                                                    className="mt-3 h-2 bg-slate-800"
-                                                    indicatorClassName="bg-gradient-to-r from-blue-500 to-cyan-400"
+                                                    className="mt-3 h-2 bg-muted"
+                                                    indicatorClassName="bg-gradient-to-r from-primary to-cyan-400"
                                                 />
                                                 <p
                                                     aria-live="polite"
-                                                    className="mt-2 text-[11px] leading-relaxed text-slate-400"
+                                                    className="mt-2 text-[11px] leading-relaxed text-muted-foreground"
                                                 >
                                                     {resultText ??
                                                         _t(
@@ -1569,7 +1592,7 @@ const BulkExportModal = ({
                                         {zipError && (
                                             <div
                                                 role="alert"
-                                                className="flex items-start gap-2 rounded-xl border border-rose-500/25 bg-rose-500/5 p-3 text-xs text-rose-300"
+                                                className="flex items-start gap-2 rounded-xl border border-rose-500/25 bg-rose-500/5 p-3 text-xs text-rose-700 dark:text-rose-300"
                                             >
                                                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                                                 {zipError}
@@ -1579,14 +1602,14 @@ const BulkExportModal = ({
                                 </div>
                             ) : (
                                 <div className="rounded-2xl border border-amber-500/25 bg-amber-500/5 p-6 text-center">
-                                    <AlertTriangle className="mx-auto h-6 w-6 text-amber-300" />
-                                    <p className="mt-3 text-sm text-amber-100">
+                                    <AlertTriangle className="mx-auto h-6 w-6 text-amber-700 dark:text-amber-300" />
+                                    <p className="mt-3 text-sm text-amber-800 dark:text-amber-100">
                                         {_t("bulkExport.preview.noInvoices")}
                                     </p>
                                     <BaseButton
                                         variant="outline"
                                         size="sm"
-                                        className="mt-4 border-slate-700 bg-slate-900/40 text-slate-200 hover:bg-slate-800"
+                                        className="mt-4 border-border bg-muted/40 text-foreground hover:bg-muted"
                                         onClick={() => goTo("map")}
                                     >
                                         <ArrowLeft className="h-4 w-4" />
@@ -1599,13 +1622,13 @@ const BulkExportModal = ({
                 </div>
 
                 {/* Persistent actions. */}
-                <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t border-slate-800/80 bg-[#050b16]/95 px-5 py-4 backdrop-blur sm:px-8">
+                <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t border-border bg-card/95 px-5 py-4 backdrop-blur sm:px-8">
                     <BaseButton
                         variant="ghost"
                         size="sm"
                         onClick={() => handleOpenChange(false)}
                         disabled={progress.running}
-                        className="text-slate-400 hover:text-white"
+                        className="text-muted-foreground hover:text-foreground"
                     >
                         {_t("bulkExport.nav.close")}
                     </BaseButton>
@@ -1617,7 +1640,7 @@ const BulkExportModal = ({
                                 size="sm"
                                 onClick={back}
                                 disabled={progress.running}
-                                className="border-slate-700 bg-slate-900/40 text-slate-200 hover:bg-slate-800 hover:text-white"
+                                className="border-border bg-muted/40 text-foreground hover:bg-muted hover:text-foreground"
                             >
                                 <ArrowLeft className="h-4 w-4" />
                                 {_t("bulkExport.nav.back")}
@@ -1656,7 +1679,7 @@ const BulkExportModal = ({
                                 variant="outline"
                                 size="sm"
                                 onClick={reset}
-                                className="border-slate-700 bg-slate-900/40 text-slate-200 hover:bg-slate-800 hover:text-white"
+                                className="border-border bg-muted/40 text-foreground hover:bg-muted hover:text-foreground"
                             >
                                 <RefreshCw className="h-4 w-4" />
                                 {_t("bulkExport.nav.startAgain")}
