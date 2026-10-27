@@ -53,5 +53,8 @@ yarn-error.log*
 /cmd.txt
 /build.log
 
+# Local agent workspace state
+/.workbuddy-ai/
+
 # Claude Code local state
 /.claude/settings.local.json
