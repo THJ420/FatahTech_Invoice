@@ -48,6 +48,7 @@ import "@fontsource/noto-sans-arabic/700.css";
 import "@fontsource-variable/noto-sans-sc";
 // SEO
 import {
+    absoluteUrl,
     buildJsonLd,
     languageAlternates,
     localePath,
@@ -96,21 +97,39 @@ export async function generateMetadata(props: {
     const meta =
         (messages as Record<string, Record<string, string>>)?.meta ?? {};
 
-    const title = meta.title ?? `${BRAND_NAME} | Free Invoice Generator`;
+    const title =
+        meta.title ??
+        `Free Bulk & PDF Invoice Generator — No Signup, 100% Local | ${BRAND_NAME}`;
     const description =
         meta.description ??
-        `Create, print and bulk-export invoices with ${BRAND_NAME}. Free, private and entirely in your browser.`;
+        "Create invoices from 15 professional templates, export instant PDFs, and bulk-generate from CSV or Excel. Encrypted local storage, 100% free — no signup.";
+
+    const image = absoluteUrl(locale, "/opengraph-image");
 
     return {
-        // Resolves every relative URL below, including the generated OG image.
+        // Base for generated social images and any relative URL below. The
+        // canonical itself is absolute so English's remains the origin with
+        // its trailing slash — https://invoice.fatahtech.com/.
         metadataBase: new URL(BASE_URL),
         applicationName: BRAND_NAME,
         title,
         description,
         keywords: ROOTKEYWORDS,
-        robots: { index: true, follow: true },
+        robots: {
+            index: true,
+            follow: true,
+            googleBot: {
+                index: true,
+                follow: true,
+                "max-image-preview": "large",
+                "max-snippet": -1,
+                "max-video-preview": -1,
+            },
+        },
         alternates: {
-            canonical: localePath(locale),
+            // Absolute so the default locale's canonical keeps its final "/":
+            // the requested canonical is https://invoice.fatahtech.com/.
+            canonical: `${BASE_URL}${localePath(locale)}`,
             languages: languageAlternates(),
         },
         openGraph: {
@@ -118,13 +137,22 @@ export async function generateMetadata(props: {
             siteName: BRAND_NAME,
             title,
             description,
-            url: localePath(locale),
+            url: `${BASE_URL}${localePath(locale)}`,
             locale,
+            images: [
+                {
+                    url: image,
+                    width: 1200,
+                    height: 630,
+                    alt: `${BRAND_NAME} — free bulk and PDF invoice generator`,
+                },
+            ],
         },
         twitter: {
             card: "summary_large_image",
             title,
             description,
+            images: [image],
         },
         authors: {
             name: BRAND_NAME,

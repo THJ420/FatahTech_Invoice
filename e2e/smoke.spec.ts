@@ -478,19 +478,20 @@ test.describe("invoice builder", () => {
             );
             /*
              * The app region must fit the viewport without scrolling. The
-             * document itself is much taller — the marketing section and the
-             * footer sit below the fold on purpose — so measuring document
-             * height would test the wrong thing.
+             * document itself is much taller — the homepage's keyword and FAQ
+             * section and the footer sit below the fold on purpose — so
+             * measuring document or <main> height would test the wrong thing.
+             * The builder wrapper is the pinned region.
              */
-            const main = document.querySelector("main");
-            const mainBottom = main
-                ? main.getBoundingClientRect().bottom
+            const builder = document.getElementById("invoice-builder");
+            const builderBottom = builder
+                ? builder.getBoundingClientRect().bottom
                 : Infinity;
 
             return {
                 paneCount: panes.length,
                 horizontal: de.scrollWidth > de.clientWidth + 1,
-                mainBottom: Math.round(mainBottom),
+                mainBottom: Math.round(builderBottom),
                 viewportHeight: de.clientHeight,
             };
         });
@@ -934,11 +935,26 @@ test.describe("invoice builder", () => {
             html.match(/<title>(.*?)<\/title>/i)?.[1] ?? "";
         const canonicalOf = (html: string) =>
             html.match(/rel="canonical"[^>]*href="([^"]+)"/i)?.[1] ?? "";
+        const decode = (value: string) => value.replace(/&amp;/g, "&");
 
         // Every locale served one English title and one canonical before this.
         expect(titleOf(enHtml)).not.toBe(titleOf(azHtml));
-        expect(canonicalOf(enHtml)).toMatch(/\/en$/);
-        expect(canonicalOf(azHtml)).toMatch(/\/az$/);
+        expect(decode(titleOf(enHtml))).toBe(
+            "Free Bulk & PDF Invoice Generator — No Signup, 100% Local | FatahTech Invoice"
+        );
+
+        // English is unprefixed now, so its canonical is the origin itself —
+        // slash included. The prefixed locales still canonicalise to /xx.
+        expect(canonicalOf(enHtml)).toBe("https://invoice.fatahtech.com/");
+        expect(canonicalOf(azHtml)).toBe("https://invoice.fatahtech.com/az/");
+
+        const description =
+            enHtml.match(/<meta name="description" content="([^"]*)"/)?.[1] ??
+            "";
+        expect(description.length).toBeGreaterThanOrEqual(140);
+        expect(description.length).toBeLessThanOrEqual(155);
+        expect(description).toContain("15 professional templates");
+        expect(description).toContain("CSV or Excel");
 
         // hreflang: one per locale plus x-default. Next serialises the
         // attribute as `hrefLang`, which HTML parses case-insensitively.
@@ -950,15 +966,18 @@ test.describe("invoice builder", () => {
         // Open Graph and Twitter, neither of which existed.
         expect(enHtml).toMatch(/property="og:image"/i);
         expect(enHtml).toMatch(/name="twitter:card"/i);
+        expect(enHtml).toMatch(
+            /property="og:url" content="https:\/\/invoice\.fatahtech\.com\/"/i
+        );
 
         // Exactly one h1 — the invoice templates used to render their own
         // inside the live preview, out of the user's data.
         expect((enHtml.match(/<h1/g) ?? []).length).toBe(1);
 
         /*
-         * Structured data: the application description. The FAQ schema is not
-         * here any more — it moved to /guide with the copy, and is asserted in
-         * the guide test below.
+         * The FAQ schema lives with the homepage FAQ that renders it, and the
+         * application node carries the fields AI Overviews and app rich results
+         * read: free, browser-based, published by FatahTech.
          */
         const blocks = [
             ...enHtml.matchAll(
@@ -967,7 +986,19 @@ test.describe("invoice builder", () => {
         ].map((m) => JSON.parse(m[1]));
         const types = blocks.map((b) => b["@type"]);
         expect(types).toContain("WebApplication");
-        expect(types).not.toContain("FAQPage");
+        expect(types).toContain("FAQPage");
+
+        const app = blocks.find((b) => b["@type"] === "WebApplication");
+        expect(app.operatingSystem).toBe("Web Browser");
+        expect(app.applicationCategory).toBe("BusinessApplication");
+        expect(app.isAccessibleForFree).toBe(true);
+        expect(app.offers).toMatchObject({
+            price: "0",
+            priceCurrency: "USD",
+        });
+        expect(app.publisher["@id"]).toBe(
+            "https://fatahtech.com/#organization"
+        );
     });
 
     test("sitemap, robots and manifest are served", async ({ request }) => {
@@ -977,15 +1008,25 @@ test.describe("invoice builder", () => {
         // One entry per locale, plus one per locale for /guide.
         expect((xml.match(/<url>/g) ?? []).length).toBeGreaterThanOrEqual(34);
         expect(
-            (xml.match(/\/guide<\/loc>/g) ?? []).length
+            (xml.match(/\/guide\/<\/loc>/g) ?? []).length
         ).toBeGreaterThanOrEqual(17);
         expect(xml).toContain("xhtml:link");
+
+        // The canonical origin is the app's own host — not fatahtech.com —
+        // and English is the root with its trailing slash.
+        expect(xml).toContain("<loc>https://invoice.fatahtech.com/</loc>");
+        expect(xml).toContain(
+            "<loc>https://invoice.fatahtech.com/guide/</loc>"
+        );
+        expect(xml).not.toContain("<loc>https://fatahtech.com/</loc>");
 
         const robots = await request.get("/robots.txt");
         expect(robots.status()).toBe(200);
         const txt = await robots.text();
         // The static robots.txt it replaced named no sitemap at all.
-        expect(txt).toMatch(/Sitemap:\s*https?:\/\/\S+\/sitemap\.xml/);
+        expect(txt).toMatch(
+            /Sitemap:\s*https:\/\/invoice\.fatahtech\.com\/sitemap\.xml/
+        );
         expect(txt).toMatch(/Disallow:\s*\/api\//);
 
         const manifest = await request.get("/manifest.webmanifest");
@@ -1325,18 +1366,27 @@ test.describe("invoice builder", () => {
         }
     });
 
-    test("the guide owns the copy and the FAQ, the homepage owns the tool", async ({
+    test("the homepage carries the keyword copy and FAQ, the guide the walkthrough", async ({
         request,
     }) => {
-        const home = await request.get("/en");
-        const guide = await request.get("/en/guide");
+        const home = await request.get("/");
+        const guide = await request.get("/guide");
+        expect(home.status()).toBe(200);
         expect(guide.status()).toBe(200);
 
         const homeHtml = await home.text();
         const guideHtml = await guide.text();
 
+        const decode = (value: string) => value.replace(/&amp;/g, "&");
+        const textOf = (value: string) =>
+            decode(
+                value
+                    .replace(/<[^>]+>/g, " ")
+                    .replace(/\s+/g, " ")
+                    .trim()
+            );
         const h1 = (html: string) =>
-            html.match(/<h1[^>]*>(.*?)<\/h1>/i)?.[1] ?? "";
+            textOf(html.match(/<h1[^>]*>(.*?)<\/h1>/i)?.[1] ?? "");
         const canonical = (html: string) =>
             html.match(/rel="canonical"[^>]*href="([^"]+)"/i)?.[1] ?? "";
         const blocks = (html: string) =>
@@ -1346,30 +1396,80 @@ test.describe("invoice builder", () => {
                 ),
             ].map((m) => JSON.parse(m[1]));
 
-        // Distinct heading and canonical, or the two pages compete.
+        // The exact primary heading, and distinct canonicals, or the two pages
+        // compete for the same query.
+        expect(h1(homeHtml)).toBe(
+            "Free Browser Invoice Generator & Bulk PDF Maker"
+        );
         expect(h1(guideHtml)).not.toBe(h1(homeHtml));
-        expect(canonical(guideHtml)).toMatch(/\/en\/guide$/);
+        expect(canonical(homeHtml)).toBe("https://invoice.fatahtech.com/");
+        expect(canonical(guideHtml)).toBe(
+            "https://invoice.fatahtech.com/guide/"
+        );
 
-        // One h1 each — the homepage's is visually hidden, but present.
+        // One h1 each.
         expect((guideHtml.match(/<h1/g) ?? []).length).toBe(1);
         expect((homeHtml.match(/<h1/g) ?? []).length).toBe(1);
 
+        // The three sections the page is written around.
+        const h2s = [
+            ...homeHtml.matchAll(/<h2[^>]*>(.*?)<\/h2>/gi),
+        ].map((m) => textOf(m[1]));
+        expect(h2s).toContain(
+            "15 Custom Invoice Templates — Customize Fonts, Colors, Logos & Signatures"
+        );
+        expect(h2s).toContain(
+            "Bulk Invoice Generator: Convert CSV & Excel Data to Finished PDF Invoices"
+        );
+        expect(h2s).toContain(
+            "100% Local & Encrypted: Your Financial Data Never Leaves Your Browser"
+        );
+
         /*
-         * The FAQ moved here with the rest of the copy; the homepage is now the
-         * builder and nothing below it. One URL owns the schema, and it is the
-         * one that renders the answers — which is what Google's guidance
-         * actually requires.
+         * One URL owns the FAQ schema, and it is the one that renders the
+         * answers — which is what Google's guidance actually requires. The
+         * guide keeps the feature walkthrough and loses the duplicate FAQ.
          */
-        const faq = blocks(guideHtml).find((b) => b["@type"] === "FAQPage");
-        expect(faq, "the guide should carry the FAQ schema").toBeTruthy();
-        expect(blocks(homeHtml).map((b) => b["@type"])).not.toContain(
+        const faq = blocks(homeHtml).find((b) => b["@type"] === "FAQPage");
+        expect(faq, "the homepage should carry the FAQ schema").toBeTruthy();
+        expect(blocks(guideHtml).map((b) => b["@type"])).not.toContain(
             "FAQPage"
         );
 
-        const rendered = (guideHtml.match(/<dt[^>]*>/g) ?? []).length;
+        const rendered = (homeHtml.match(/<details/g) ?? []).length;
         expect(faq.mainEntity.length).toBe(rendered);
+        expect(faq.mainEntity.length).toBeGreaterThanOrEqual(8);
 
-        // The guide carries the prose; the homepage no longer has to.
+        const questions = faq.mainEntity.map(
+            (entry: { name: string }) => entry.name
+        );
+        expect(questions).toContain("Is FatahTech Invoice completely free?");
+        expect(questions).toContain(
+            "How does bulk CSV invoice generation work?"
+        );
+        expect(questions).toContain(
+            "Are my client data and invoice records uploaded to a server?"
+        );
+        expect(questions).toContain(
+            "Can I export invoices as PDF, JSON, and XLSX?"
+        );
+
+        // The guide gets its own breadcrumb trail.
+        const crumbs = blocks(guideHtml).find(
+            (b) => b["@type"] === "BreadcrumbList"
+        );
+        expect(crumbs?.itemListElement.length).toBe(2);
+
+        // The attribution link back to the tools hub.
+        expect(homeHtml).toContain(
+            'href="https://fatahtech.com/tools/freebies"'
+        );
+        expect(homeHtml).toMatch(
+            /href="https:\/\/fatahtech\.com\/tools\/freebies"[^>]*target="_blank"[^>]*rel="noopener"/
+        );
+        expect(homeHtml).toContain("Browse All Free Browser Tools");
+
+        // Both pages have real copy; the homepage now has the most.
         const prose = (html: string) =>
             html
                 .replace(/<script[\s\S]*?<\/script[^>]*>/gi, " ")
@@ -1377,7 +1477,7 @@ test.describe("invoice builder", () => {
                 .replace(/\s+/g, " ")
                 .trim().length;
         expect(prose(guideHtml)).toBeGreaterThan(1200);
-        expect(prose(homeHtml)).toBeLessThan(prose(guideHtml));
+        expect(prose(homeHtml)).toBeGreaterThan(2500);
     });
 
     test("the navbar help button opens a two-tab panel", async ({ page }) => {
@@ -1405,12 +1505,16 @@ test.describe("invoice builder", () => {
         await expect(
             dialog.getByRole("tab", { name: /about & faqs/i })
         ).toHaveAttribute("data-state", "active");
-        await expect(dialog.getByText("Free invoice generator")).toBeVisible();
+        await expect(
+            dialog.getByText("Free Browser Invoice Generator & Bulk PDF Maker")
+        ).toBeVisible();
 
-        const question = dialog.getByText("Is FatahTech Invoice really free?");
+        const question = dialog.getByText(
+            "Is FatahTech Invoice completely free?"
+        );
         await expect(question).toBeVisible();
         await question.click();
-        await expect(dialog.getByText(/There is no paid tier/)).toBeVisible();
+        await expect(dialog.getByText(/no paid tier/)).toBeVisible();
 
         // Tab 2: the step-by-step guide.
         await dialog.getByRole("tab", { name: /user guide/i }).click();

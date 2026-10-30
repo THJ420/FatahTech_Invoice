@@ -326,14 +326,75 @@
     "changeAppearance": "Change the invoice's appearance"
   },
   "meta": {
-    "title": "Free Invoice Generator | FatahTech Invoice",
-    "description": "Create a professional invoice in minutes. Fifteen templates, your own colours and logo, client-side printing, and bulk ZIP export. Free, no account needed.",
-    "ogTitle": "Free invoice generator",
-    "ogDescription": "Fifteen templates. Print or save as PDF, or export a batch as a ZIP. No account."
+    "title": "Free Bulk & PDF Invoice Generator — No Signup, 100% Local | FatahTech Invoice",
+    "description": "Create invoices from 15 professional templates, export instant PDFs, and bulk-generate from CSV or Excel. Encrypted local storage, 100% free — no signup.",
+    "guideDescription": "See how the free browser invoice generator works: 15 templates, custom fonts, colours, logos and signatures, encrypted local storage, instant PDF printing and bulk CSV or Excel export.",
+    "ogTitle": "Free Bulk & PDF Invoice Generator",
+    "ogDescription": "15 professional templates · Instant PDF export · Bulk CSV & Excel invoices · 100% local, free, no signup."
   },
   "landing": {
-    "h1": "Free invoice generator",
-    "intro": "FatahTech Invoice builds professional invoices in your browser. Choose one of fifteen templates, set your accent colour and typeface, add your logo and signature, then print, save as PDF, or export a whole batch from a spreadsheet. Nothing is uploaded to an account, because there are no accounts.",
+    "h1": "Free Browser Invoice Generator & Bulk PDF Maker",
+    "intro": "FatahTech Invoice is a free, browser-based invoice generator for freelancers, agencies and small businesses. Choose one of 15 professional templates, add your logo, colors and signature, then print or save a pixel-perfect PDF in seconds. Need a batch? Upload a CSV or Excel file and the bulk invoice generator turns every row into a finished PDF \u2014 no signup, no server, no data leaving your browser.",
+    "home": {
+      "eyebrow": "Free forever \u00b7 No signup \u00b7 Runs 100% in your browser",
+      "sections": {
+        "templates": {
+          "heading": "15 Custom Invoice Templates \u2014 Customize Fonts, Colors, Logos & Signatures",
+          "body": "Every layout is a genuinely different A4 invoice, not one design recolored fifteen times. Sidebar layouts, bold headers, minimal receipts, ruled forms and centered mastheads are all included, and each one paginates properly when an invoice runs long.",
+          "points": {
+            "1": {
+              "title": "Fifteen distinct layouts",
+              "body": "Compare every template side by side with your own data in the live preview, then switch without re-entering a single field."
+            },
+            "2": {
+              "title": "Fonts, colors and density",
+              "body": "Pick from four typefaces, set any accent color or brand hex, and choose compact, comfortable or spacious density so twenty line items still fit on one page."
+            },
+            "3": {
+              "title": "Logos and signatures",
+              "body": "Upload your company logo and add a drawn, typed or uploaded signature. Your branding appears on every invoice you print or export."
+            }
+          }
+        },
+        "bulk": {
+          "heading": "Bulk Invoice Generator: Convert CSV & Excel Data to Finished PDF Invoices",
+          "body": "Bulk Export is built into the same browser app. Upload a spreadsheet of invoices, map its columns once, and download a ZIP containing every invoice as a finished PDF \u2014 ideal for recurring billing, month-end runs and agency retainers.",
+          "points": {
+            "1": {
+              "title": "Upload CSV, XLS or XLSX",
+              "body": "Drop in a .csv, .xls or .xlsx file, or start from the sample template. Rows are grouped by invoice number, so a single invoice can contain as many line items as it needs."
+            },
+            "2": {
+              "title": "Map columns in seconds",
+              "body": "Headers are matched automatically to sender, client, dates, line items, tax and totals. Check the required fields, adjust any mapping, and preview the source rows before exporting."
+            },
+            "3": {
+              "title": "Download one ZIP",
+              "body": "Apply a template, font, accent color and density once, preview a real A4 page, then export every invoice as a PDF in a single ZIP \u2014 entirely on your device."
+            }
+          }
+        },
+        "privacy": {
+          "heading": "100% Local & Encrypted: Your Financial Data Never Leaves Your Browser",
+          "body": "There is no invoice database behind this tool. Drafts, saved invoices, clients and sender details live in your browser, encrypted with AES-GCM before they are written to disk \u2014 and the key never leaves your device.",
+          "points": {
+            "1": {
+              "title": "Encrypted at rest",
+              "body": "Saved drafts and records are encrypted with AES-GCM 256 using a non-extractable browser key, so casual inspection of local storage reveals nothing readable."
+            },
+            "2": {
+              "title": "No account, no upload",
+              "body": "No signup, no email and no tracking pixel in your invoice. The generator, the templates and bulk export all run client-side, so your client list is never sent to a server."
+            },
+            "3": {
+              "title": "Export or erase anytime",
+              "body": "Your data stays portable: export as JSON, CSV, XLSX, DOCX, XML or PDF, and delete saved invoices or site data whenever you choose."
+            }
+          }
+        }
+      },
+      "faqIntro": "Short answers to what people ask before moving their invoicing into the browser."
+    },
     "guideH1": "How FatahTech Invoice works",
     "guideIntro": "A walk through what the invoice generator does and how to use it: the fifteen templates, the things you can change about them, and the steps from an empty form to a printed invoice or a bulk ZIP export.",
     "featuresHeading": "What you get",
@@ -366,27 +427,39 @@
         "body": "Print the invoice, save it from the print dialog, save it to reopen later \u2014 or use Bulk Export to turn a spreadsheet into a ZIP of finished PDFs."
       }
     },
-    "faqHeading": "Questions",
+    "faqHeading": "Frequently asked questions about the invoice generator",
     "faq": {
       "1": {
-        "q": "Is FatahTech Invoice really free?",
-        "a": "Yes. There is no paid tier, no trial, and no account to create. The invoice generator, all fifteen templates, printing and bulk export are free to use."
+        "q": "Is FatahTech Invoice completely free?",
+        "a": "Yes. All 15 templates, unlimited invoices, PDF printing and bulk export are free, with no paid tier, no trial and no watermark. There is no account to create and no card to enter."
       },
       "2": {
-        "q": "Do I need to sign up?",
-        "a": "No. Your invoice is held in your own browser while you work on it, and saved invoices stay in your browser's local storage. Nothing is stored on a server."
+        "q": "How does bulk CSV invoice generation work?",
+        "a": "Open Bulk Export and upload a .csv, .xls or .xlsx file. The bulk invoice creator from Excel or CSV groups rows by invoice number, maps your columns to invoice fields, and lets you style the batch once. It then renders each invoice and downloads every PDF in a single ZIP \u2014 locally in your browser, with no server upload."
       },
       "3": {
-        "q": "Can I add my company logo?",
-        "a": "Yes. Upload an image on the invoice details step and it appears on fourteen of the fifteen templates. The Minimal template is deliberately logo-free."
+        "q": "Are my client data and invoice records uploaded to a server?",
+        "a": "No. Invoices, clients and drafts are stored in your browser and encrypted at rest with AES-GCM. Nothing is uploaded, and there is no server-side invoice database holding a copy of your financial data."
       },
       "4": {
-        "q": "What currencies and languages are supported?",
-        "a": "Over a hundred and seventy currencies, formatted for the language you are using, and the interface is translated into eighteen languages. The invoice document itself is translated into thirteen of them."
+        "q": "Can I export invoices as PDF, JSON, and XLSX?",
+        "a": "Yes. Print or save any invoice as a PDF, and export structured data as JSON, CSV, XML, XLSX or DOCX, plus an EN 16931 e-invoice. Bulk Export produces a ZIP of finished PDFs from your spreadsheet."
       },
       "5": {
+        "q": "Do I need to sign up or install anything?",
+        "a": "No. FatahTech Invoice is a browser invoice maker: open the page, fill in the form and print. There is no signup, no download and no browser extension to install."
+      },
+      "6": {
+        "q": "Can I add my company logo and signature?",
+        "a": "Yes. Upload a logo on the invoice details step \u2014 it appears on fourteen of the fifteen templates \u2014 and add a drawn, typed or uploaded signature. Both are included in the printed PDF."
+      },
+      "7": {
+        "q": "What currencies and languages are supported?",
+        "a": "Over 170 currencies formatted for your locale, an interface translated into 18 languages, and invoice documents translated into 13. Dates and amounts follow the language you choose."
+      },
+      "8": {
         "q": "Can I edit an invoice after printing it?",
-        "a": "Yes. The preview stays live, so change any field and print again when you are ready. Bulk export reads the spreadsheet you uploaded, not the current form."
+        "a": "Yes. The live preview stays editable, so change any field and print again. Saved invoices can be reopened from this browser, and bulk export always reads the spreadsheet you uploaded."
       }
     }
   },

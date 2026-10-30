@@ -1,8 +1,6 @@
 import { getMessagesSafe } from "@/i18n/messages";
-import { buildFaqJsonLd } from "@/lib/seo";
 
 type Feature = { title: string; body: string };
-type Faq = { q: string; a: string };
 
 /*
  * The lists are objects keyed "1", "2", "3" rather than arrays: next-intl's
@@ -19,18 +17,16 @@ type Landing = {
     features: Record<string, Feature>;
     howHeading: string;
     how: Record<string, Feature>;
-    faqHeading: string;
-    faq: Record<string, Faq>;
 };
 
 /**
  * The long-form copy, on the guide page.
  *
- * This used to render below the builder on the homepage as well. The homepage
- * is now the tool and nothing else — the same prose lives here, where a reader
- * who wants it can find it, and where it stays indexable. In the app itself the
- * same questions are answered by the Help & FAQ panel in the navbar, which
- * reads the identical `landing.faq` messages, so the two cannot drift.
+ * The homepage now carries the keyword sections and the FAQ (see
+ * HomeContent); this page keeps the feature walkthrough and the step-by-step
+ * explanation, so the two URLs answer different questions instead of competing
+ * with the same FAQ. The help panel in the navbar reads `landing.faq`, the
+ * same messages the homepage FAQ renders, so the two cannot drift.
  *
  * A server component on purpose — this is the half of the page that must exist
  * in the HTML rather than after hydration.
@@ -101,38 +97,7 @@ export default async function LandingContent({ locale }: { locale: string }) {
                     </ol>
                 </div>
 
-                <div className="mx-auto mt-16 max-w-3xl">
-                    <h2 className="text-xl font-semibold tracking-tight">
-                        {landing.faqHeading}
-                    </h2>
-                    <dl className="mt-6 divide-y divide-border border-t border-border">
-                        {Object.values(landing.faq).map((item) => (
-                            <div key={item.q} className="py-5">
-                                <dt className="text-base font-medium">
-                                    {item.q}
-                                </dt>
-                                <dd className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                                    {item.a}
-                                </dd>
-                            </div>
-                        ))}
-                    </dl>
-                </div>
             </div>
-
-            {/*
-             * FAQPage structured data, built from the same array that renders
-             * above — so the markup and the schema can never disagree, which is
-             * what Google's rich-results guidance actually requires.
-             */}
-            <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{
-                    __html: JSON.stringify(
-                        buildFaqJsonLd(Object.values(landing.faq))
-                    ),
-                }}
-            />
         </section>
     );
 }

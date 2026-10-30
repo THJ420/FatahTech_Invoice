@@ -10,6 +10,14 @@ import { defineConfig, devices } from "@playwright/test";
  * It builds and serves the production bundle rather than running `next dev`,
  * so the tests exercise what actually ships.
  */
+/*
+ * Port 3000 is the default, but it is often already taken by a local preview
+ * server — in which case `reuseExistingServer` would hand the suite a server
+ * that is not this app. PLAYWRIGHT_PORT lets a run pick a free one.
+ */
+const port = Number(process.env.PLAYWRIGHT_PORT ?? 3000);
+const baseURL = `http://127.0.0.1:${port}`;
+
 export default defineConfig({
     testDir: "./e2e",
     // The suite is small; running it serially keeps the single dev server sane
@@ -21,7 +29,7 @@ export default defineConfig({
     reporter: process.env.CI ? "github" : "list",
 
     use: {
-        baseURL: "http://127.0.0.1:3000",
+        baseURL,
         trace: "on-first-retry",
     },
 
@@ -52,9 +60,11 @@ export default defineConfig({
     ],
 
     webServer: {
-        command: "npm run build && npm run start",
-        url: "http://127.0.0.1:3000/en",
-        reuseExistingServer: !process.env.CI,
+        command: `npm run build && npm run start -- -p ${port}`,
+        url: `${baseURL}/`,
+        // An explicit PLAYWRIGHT_PORT means the caller has chosen a port to
+        // isolate this run; never reuse whatever else happens to answer there.
+        reuseExistingServer: !process.env.CI && !process.env.PLAYWRIGHT_PORT,
         // A cold build plus a Chromium launch is slow on a cold cache.
         timeout: 5 * 60 * 1000,
         stdout: "pipe",

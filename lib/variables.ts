@@ -20,14 +20,15 @@ export const BRAND_URL = "https://fatahtech.com";
  * Canonical origin, used for metadataBase, canonicals, hreflang, the sitemap
  * and JSON-LD.
  *
- * Read from the environment so a preview deployment or a future custom domain
- * does not need a code change — and, more importantly, so those deployments
- * stop advertising the production URL as their canonical. No trailing slash.
+ * This app is the invoice tool at invoice.fatahtech.com, not the marketing site
+ * — falling back to BRAND_URL made every canonical, OG URL and sitemap entry
+ * point at the parent domain. Read from the environment so a preview
+ * deployment or a future custom domain does not need a code change. No
+ * trailing slash.
  */
-export const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL || BRAND_URL).replace(
-    /\/$/,
-    ""
-);
+export const BASE_URL = (
+    process.env.NEXT_PUBLIC_SITE_URL || "https://invoice.fatahtech.com"
+).replace(/\/$/, "");
 
 /**
  * API endpoints

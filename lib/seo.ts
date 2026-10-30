@@ -6,77 +6,127 @@ import {
     LOCALES,
 } from "@/lib/variables";
 
+/**
+ * Search vocabulary the product actually answers.
+ *
+ * These are the phrases the homepage copy and FAQ are written around — a list
+ * that no longer matches the page would be the kind of keyword stuffing Google
+ * ignores at best and penalises at worst.
+ */
 export const ROOTKEYWORDS = [
-    "invoice",
-    "invoice generator",
-    "invoice generating",
-    "invoice app",
-    "invoice generator app",
     "free invoice generator",
+    "bulk invoice generator",
+    "free PDF invoice generator no signup",
+    "browser invoice maker",
+    "bulk invoice creator from excel",
+    "CSV invoice generator",
+    "Excel invoice generator",
     "invoice template",
-    "pdf invoice",
-    "bulk invoice export",
+    "invoice templates",
+    "PDF invoice",
+    "online invoice maker",
+    "bulk PDF invoices",
+    "invoice generator no signup",
     "fatahtech invoice",
 ];
 
-/** Path for a locale, always prefixed — routing uses localePrefix "always". */
-export const localePath = (locale: string) => `/${locale}`;
+/** English is unprefixed, every other locale is path-prefixed. */
+const localePrefix = (locale: string) =>
+    locale === DEFAULT_LOCALE ? "" : `/${locale}`;
+
+/**
+ * Path for a locale and optional sub-path.
+ *
+ * `localePath("en")` is "/" and `localePath("en", "/guide")` is "/guide/";
+ * `localePath("az")` is "/az/". Canonicals, hreflang, sitemap entries and
+ * JSON-LD URLs all come from here so the default-locale special case exists in
+ * exactly one place.
+ */
+export const localePath = (locale: string, path = "") => {
+    const suffix = path ? (path.startsWith("/") ? path : `/${path}`) : "";
+    const result = `${localePrefix(locale)}${suffix}`;
+    if (!result) return "/";
+    // next.config sets trailingSlash: true, so every page URL ends in one.
+    return result.endsWith("/") ? result : `${result}/`;
+};
+
+/** Absolute URL for a locale and optional sub-path, without a trailing slash. */
+export const absoluteUrl = (locale: string, path = "") => {
+    const suffix = path ? (path.startsWith("/") ? path : `/${path}`) : "";
+    return `${BASE_URL}${localePrefix(locale)}${suffix}`;
+};
 
 /**
  * `alternates.languages` for Next's metadata.
  *
- * Every locale points at its own path, plus an `x-default` on English. The
- * previous metadata had no hreflang at all and a single hardcoded canonical of
- * `BASE_URL` — which, because the default locale is still prefixed, is a
- * redirect rather than a page. Every locale was therefore telling search
- * engines that the canonical version of itself was a redirect to English.
+ * Every locale points at its own path, plus an `x-default` on English. English
+ * is "/" rather than "/en" so the canonical and the hreflang agree. Absolute
+ * URLs on purpose: Next resolves a bare "/" against metadataBase and drops the
+ * trailing slash, which would publish the origin as "https://…" instead of
+ * "https://…/".
  */
-export function languageAlternates(): Record<string, string> {
+export function languageAlternates(path = ""): Record<string, string> {
     const languages: Record<string, string> = {};
     for (const { code } of LOCALES) {
-        languages[code] = localePath(code);
+        languages[code] = `${BASE_URL}${localePath(code, path)}`;
     }
-    languages["x-default"] = localePath(DEFAULT_LOCALE);
+    languages["x-default"] = `${BASE_URL}${localePath(DEFAULT_LOCALE, path)}`;
     return languages;
 }
 
 /**
  * Structured data for the site.
  *
- * The previous object declared `@type: "Website"` — not a real schema.org type,
- * which is `WebSite` — while *also* carrying an `@graph` with a second, almost
- * empty WebSite node, so it described the same thing twice and neither
- * completely. Its `image` pointed at a hashed `/_next/static/media/…` build
- * artefact that 404s after any rebuild.
+ * WebApplication rather than the generic WebSite node: Google uses
+ * applicationCategory, operatingSystem and offers to describe a tool in AI
+ * Overviews and app-style rich results. `publisher` is pinned to the parent
+ * organisation's @id so the invoice tool and fatahtech.com resolve as one
+ * brand rather than two unrelated entities.
  */
 export function buildJsonLd(locale: string) {
     const url = `${BASE_URL}${localePath(locale)}`;
+
+    const organization = {
+        "@type": "Organization",
+        "@id": `${BRAND_URL}/#organization`,
+        name: "FatahTech",
+        url: BRAND_URL,
+        logo: `${BASE_URL}/assets/favicon/android-chrome-512x512.png`,
+    };
 
     return {
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "@id": `${BASE_URL}/#app`,
         name: BRAND_NAME,
+        alternateName: "Free Bulk & PDF Invoice Generator",
         url,
-        applicationCategory: "BusinessApplication",
-        operatingSystem: "Any",
         description:
-            "Free invoice generator. Build, print and bulk-export invoices from fifteen templates, entirely in the browser.",
+            "Free browser invoice generator with 15 professional templates, instant PDF printing and bulk invoice creation from CSV or Excel. Encrypted, local-first and no signup.",
+        applicationCategory: "BusinessApplication",
+        applicationSubCategory: "Invoice Generator",
+        operatingSystem: "Web Browser",
+        browserRequirements: "Requires JavaScript. Requires HTML5.",
+        isAccessibleForFree: true,
         inLanguage: locale,
         keywords: ROOTKEYWORDS,
-        // Generated on demand by app/[locale]/opengraph-image.tsx, so it cannot
-        // go stale the way a hashed asset URL did.
-        image: `${BASE_URL}${localePath(locale)}/opengraph-image`,
+        image: absoluteUrl(locale, "/opengraph-image"),
+        featureList: [
+            "15 professional invoice templates",
+            "Custom fonts, accent colors, logos and signatures",
+            "Single-invoice PDF printing",
+            "Bulk invoice generation from CSV, XLS and XLSX",
+            "Encrypted client-side storage",
+            "JSON, CSV, XLSX, DOCX, XML and EN 16931 export",
+        ],
         offers: {
             "@type": "Offer",
             price: "0",
             priceCurrency: "USD",
+            availability: "https://schema.org/InStock",
         },
-        author: {
-            "@type": "Organization",
-            name: "FatahTech",
-            url: BRAND_URL,
-        },
+        publisher: organization,
+        author: organization,
     };
 }
 
@@ -90,5 +140,27 @@ export function buildFaqJsonLd(faqs: { q: string; a: string }[]) {
             name: q,
             acceptedAnswer: { "@type": "Answer", text: a },
         })),
+    };
+}
+
+/** Home → How it works, for the guide page. */
+export function buildBreadcrumbJsonLd(locale: string) {
+    return {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+            {
+                "@type": "ListItem",
+                position: 1,
+                name: "Invoice Generator",
+                item: `${BASE_URL}${localePath(locale)}`,
+            },
+            {
+                "@type": "ListItem",
+                position: 2,
+                name: "How it works",
+                item: `${BASE_URL}${localePath(locale, "/guide")}`,
+            },
+        ],
     };
 }
