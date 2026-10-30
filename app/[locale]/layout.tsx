@@ -50,6 +50,7 @@ import "@fontsource-variable/noto-sans-sc";
 import {
     absoluteUrl,
     buildJsonLd,
+    isIndexableLocale,
     languageAlternates,
     localePath,
     ROOTKEYWORDS,
@@ -105,6 +106,7 @@ export async function generateMetadata(props: {
         "Create invoices from 15 professional templates, export instant PDFs, and bulk-generate from CSV or Excel. Encrypted local storage, 100% free — no signup.";
 
     const image = absoluteUrl(locale, "/opengraph-image");
+    const indexable = isIndexableLocale(locale);
 
     return {
         // Base for generated social images and any relative URL below. The
@@ -115,22 +117,30 @@ export async function generateMetadata(props: {
         title,
         description,
         keywords: ROOTKEYWORDS,
-        robots: {
-            index: true,
-            follow: true,
-            googleBot: {
-                index: true,
-                follow: true,
-                "max-image-preview": "large",
-                "max-snippet": -1,
-                "max-video-preview": -1,
-            },
-        },
+        /*
+         * Partial translations stay usable and crawlable so the language
+         * switcher works, but they must not compete with the complete English
+         * copy in the index.
+         */
+        robots: indexable
+            ? {
+                  index: true,
+                  follow: true,
+                  googleBot: {
+                      index: true,
+                      follow: true,
+                      "max-image-preview": "large",
+                      "max-snippet": -1,
+                      "max-video-preview": -1,
+                  },
+              }
+            : { index: false, follow: true },
         alternates: {
             // Absolute so the default locale's canonical keeps its final "/":
             // the requested canonical is https://invoice.fatahtech.com/.
             canonical: `${BASE_URL}${localePath(locale)}`,
-            languages: languageAlternates(),
+            // Only complete locales get hreflang entries; see INDEXABLE_LOCALES.
+            ...(indexable ? { languages: languageAlternates() } : {}),
         },
         openGraph: {
             type: "website",

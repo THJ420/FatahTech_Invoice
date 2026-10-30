@@ -3,7 +3,6 @@ import {
     BRAND_NAME,
     BRAND_URL,
     DEFAULT_LOCALE,
-    LOCALES,
 } from "@/lib/variables";
 
 /**
@@ -29,6 +28,22 @@ export const ROOTKEYWORDS = [
     "invoice generator no signup",
     "fatahtech invoice",
 ];
+
+/**
+ * Locales with complete, human-reviewed copy.
+ *
+ * Only English qualifies. Every other message file covers part of the tree
+ * (208 of 463 keys at best) and none has the homepage sections or the newer
+ * FAQ entries, so those pages are partly English behind a translated shell.
+ * They stay available to the language switcher, but are not advertised to
+ * crawlers — no sitemap entry, no hreflang, and a noindex meta tag — until the
+ * copy is actually translated. Add a locale here only when its file is
+ * complete.
+ */
+export const INDEXABLE_LOCALES = ["en"] as const;
+
+export const isIndexableLocale = (locale: string) =>
+    (INDEXABLE_LOCALES as readonly string[]).includes(locale);
 
 /** English is unprefixed, every other locale is path-prefixed. */
 const localePrefix = (locale: string) =>
@@ -59,18 +74,23 @@ export const absoluteUrl = (locale: string, path = "") => {
 /**
  * `alternates.languages` for Next's metadata.
  *
- * Every locale points at its own path, plus an `x-default` on English. English
- * is "/" rather than "/en" so the canonical and the hreflang agree. Absolute
- * URLs on purpose: Next resolves a bare "/" against metadataBase and drops the
- * trailing slash, which would publish the origin as "https://…" instead of
- * "https://…/".
+ * Only indexable locales are advertised. Telling Google that /az is an
+ * Azerbaijani alternate of an English page whose body is largely English is
+ * worse than not claiming the translation at all. English is "/" rather than
+ * "/en" so the canonical and the hreflang agree; absolute URLs on purpose,
+ * because Next resolves a bare "/" against metadataBase and drops the trailing
+ * slash, which would publish the origin as "https://…" instead of "https://…/".
  */
 export function languageAlternates(path = ""): Record<string, string> {
     const languages: Record<string, string> = {};
-    for (const { code } of LOCALES) {
+    for (const code of INDEXABLE_LOCALES) {
         languages[code] = `${BASE_URL}${localePath(code, path)}`;
     }
-    languages["x-default"] = `${BASE_URL}${localePath(DEFAULT_LOCALE, path)}`;
+
+    const xDefault = isIndexableLocale(DEFAULT_LOCALE)
+        ? DEFAULT_LOCALE
+        : INDEXABLE_LOCALES[0];
+    languages["x-default"] = `${BASE_URL}${localePath(xDefault, path)}`;
     return languages;
 }
 

@@ -1,13 +1,15 @@
 import type { MetadataRoute } from "next";
 
-import { languageAlternates, localePath } from "@/lib/seo";
-import { BASE_URL, LOCALES } from "@/lib/variables";
+import { INDEXABLE_LOCALES, languageAlternates, localePath } from "@/lib/seo";
+import { BASE_URL, DEFAULT_LOCALE } from "@/lib/variables";
 
 /**
- * One entry per locale, each carrying the full hreflang set.
+ * One entry per indexable locale, each carrying the hreflang set for the other
+ * indexable locales.
  *
- * There was no sitemap at all, and `app/robots.txt` had no `Sitemap:` line to
- * point at one, so the eighteen locale pages had to be discovered by crawling.
+ * Only locales with complete copy are listed. Every locale route still renders
+ * — the language switcher depends on it — but a partly-English page should not
+ * be submitted for indexing as a translation of the English one.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
     const lastModified = new Date();
@@ -27,9 +29,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
         };
     };
 
-    return LOCALES.flatMap(({ code }) => [
-        entry(localePath(code), code === "en" ? 1 : 0.8),
-        // The long-form copy, its own indexable page.
-        entry(localePath(code, "/guide"), code === "en" ? 0.7 : 0.6, true),
+    return INDEXABLE_LOCALES.flatMap((code) => [
+        entry(localePath(code), code === DEFAULT_LOCALE ? 1 : 0.8),
+        // The long-form walkthrough, its own indexable page.
+        entry(
+            localePath(code, "/guide"),
+            code === DEFAULT_LOCALE ? 0.7 : 0.6,
+            true
+        ),
     ]);
 }

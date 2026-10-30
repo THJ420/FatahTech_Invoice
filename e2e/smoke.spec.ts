@@ -622,10 +622,12 @@ test.describe("invoice builder", () => {
 
             // A real Frame, not a FrameLocator: the @font-face audit has to run
             // inside the frame's own document.
-            const printFrame = await (
-                await frameEl.elementHandle()
-            )!.contentFrame();
-            expect(printFrame, "the print frame should be reachable").not.toBeNull();
+            const printFrame =
+                await (await frameEl.elementHandle())!.contentFrame();
+            expect(
+                printFrame,
+                "the print frame should be reachable"
+            ).not.toBeNull();
 
             const paper = printFrame!.locator(".invoice-print-page");
             await expect(paper).toContainText("INV0001");
@@ -652,9 +654,10 @@ test.describe("invoice builder", () => {
                 "printing should start as soon as the document is ready"
             ).toBeGreaterThan(0);
 
-            expect(problems, `page problems://n${problems.join("//n")}`).toEqual(
-                []
-            );
+            expect(
+                problems,
+                `page problems://n${problems.join("//n")}`
+            ).toEqual([]);
         });
 
         test("printing falls back to an in-app view when the frame refuses", async ({
@@ -937,7 +940,8 @@ test.describe("invoice builder", () => {
             html.match(/rel="canonical"[^>]*href="([^"]+)"/i)?.[1] ?? "";
         const decode = (value: string) => value.replace(/&amp;/g, "&");
 
-        // Every locale served one English title and one canonical before this.
+        // English has the marketing title; the prefixed locale keeps its own
+        // translated title. Distinctness is what stops the two competing.
         expect(titleOf(enHtml)).not.toBe(titleOf(azHtml));
         expect(decode(titleOf(enHtml))).toBe(
             "Free Bulk & PDF Invoice Generator — No Signup, 100% Local | FatahTech Invoice"
@@ -956,12 +960,34 @@ test.describe("invoice builder", () => {
         expect(description).toContain("15 professional templates");
         expect(description).toContain("CSV or Excel");
 
-        // hreflang: one per locale plus x-default. Next serialises the
-        // attribute as `hrefLang`, which HTML parses case-insensitively.
+        /*
+         * Only complete locales are advertised: English and x-default. The
+         * partial translations must not claim to be alternates of the English
+         * page, and the page itself carries no hreflang at all.
+         */
         const alternates =
             enHtml.match(/rel="alternate"[^>]*hreflang=/gi) ?? [];
-        expect(alternates.length).toBeGreaterThanOrEqual(18);
+        expect(alternates.length).toBe(2);
+        expect(enHtml).toMatch(/hreflang="en"/i);
         expect(enHtml).toMatch(/hreflang="x-default"/i);
+        expect(azHtml).not.toMatch(/rel="alternate"[^>]*hreflang=/i);
+
+        /*
+         * Indexing signals: the complete locale is indexable, every partial
+         * translation is noindex but followable, so the language switcher keeps
+         * working without putting a half-English page in the index.
+         */
+        const robotsOf = (html: string) =>
+            html.match(/<meta name="robots" content="([^"]*)"/i)?.[1] ?? "";
+        expect(robotsOf(enHtml)).toMatch(/\bindex\b/);
+        expect(robotsOf(enHtml)).not.toMatch(/noindex/);
+        expect(robotsOf(azHtml)).toMatch(/noindex/);
+        expect(robotsOf(azHtml)).toMatch(/follow/);
+
+        const azGuide = await request.get("/az/guide");
+        const azGuideHtml = await azGuide.text();
+        expect(robotsOf(azGuideHtml)).toMatch(/noindex/);
+        expect(azGuideHtml).not.toMatch(/rel="alternate"[^>]*hreflang=/i);
 
         // Open Graph and Twitter, neither of which existed.
         expect(enHtml).toMatch(/property="og:image"/i);
@@ -1005,12 +1031,18 @@ test.describe("invoice builder", () => {
         const sitemap = await request.get("/sitemap.xml");
         expect(sitemap.status()).toBe(200);
         const xml = await sitemap.text();
-        // One entry per locale, plus one per locale for /guide.
-        expect((xml.match(/<url>/g) ?? []).length).toBeGreaterThanOrEqual(34);
-        expect(
-            (xml.match(/\/guide\/<\/loc>/g) ?? []).length
-        ).toBeGreaterThanOrEqual(17);
+        /*
+         * Only English has complete copy, so only its home and guide are
+         * submitted. The other locale pages still render, but advertising them
+         * here would invite Google to index a partly-English duplicate.
+         */
+        expect((xml.match(/<url>/g) ?? []).length).toBe(2);
+        expect((xml.match(/\/guide\/<\/loc>/g) ?? []).length).toBe(1);
         expect(xml).toContain("xhtml:link");
+        expect(xml).toMatch(/hreflang="en"/);
+        expect(xml).toMatch(/hreflang="x-default"/);
+        expect(xml).not.toMatch(/hreflang="az"/);
+        expect(xml).not.toContain("https://invoice.fatahtech.com/az/");
 
         // The canonical origin is the app's own host — not fatahtech.com —
         // and English is the root with its trailing slash.
@@ -1412,9 +1444,9 @@ test.describe("invoice builder", () => {
         expect((homeHtml.match(/<h1/g) ?? []).length).toBe(1);
 
         // The three sections the page is written around.
-        const h2s = [
-            ...homeHtml.matchAll(/<h2[^>]*>(.*?)<\/h2>/gi),
-        ].map((m) => textOf(m[1]));
+        const h2s = [...homeHtml.matchAll(/<h2[^>]*>(.*?)<\/h2>/gi)].map((m) =>
+            textOf(m[1])
+        );
         expect(h2s).toContain(
             "15 Custom Invoice Templates — Customize Fonts, Colors, Logos & Signatures"
         );
@@ -1522,7 +1554,9 @@ test.describe("invoice builder", () => {
             dialog.getByText("How to use FatahTech Invoice")
         ).toBeVisible();
         await expect(dialog.getByText("Fill in both parties")).toBeVisible();
-        await expect(dialog.getByText("Print, export or go bulk")).toBeVisible();
+        await expect(
+            dialog.getByText("Print, export or go bulk")
+        ).toBeVisible();
 
         await page.keyboard.press("Escape");
         await expect(dialog).toBeHidden();

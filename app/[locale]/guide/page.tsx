@@ -10,6 +10,7 @@ import { getMessagesSafe } from "@/i18n/messages";
 import {
     absoluteUrl,
     buildBreadcrumbJsonLd,
+    isIndexableLocale,
     languageAlternates,
     localePath,
     ROOTKEYWORDS,
@@ -17,13 +18,11 @@ import {
 import { BASE_URL, BRAND_NAME } from "@/lib/variables";
 
 /**
- * The long-form copy, on its own page.
+ * The long-form walkthrough, on its own page.
  *
- * It used to sit entirely below the builder, then only partly: the homepage
- * kept a heading, an intro and the FAQ while this page carried the rest. The
- * homepage is now just the tool, so the whole of it — including the FAQ and its
- * structured data — lives here, on a URL a crawler can index without the
- * builder competing with it for attention.
+ * The homepage carries the keyword sections and the FAQ; this page keeps the
+ * feature overview and the step-by-step explanation, so the two URLs answer
+ * different questions instead of competing with the same copy.
  */
 export async function generateMetadata(props: {
     params: Promise<{ locale: string }>;
@@ -38,16 +37,20 @@ export async function generateMetadata(props: {
     const title = landing.guideH1 ?? landing.h1 ?? "How it works";
     const description = meta.guideDescription ?? meta.description ?? "";
     const image = absoluteUrl(locale, "/opengraph-image");
+    const indexable = isIndexableLocale(locale);
 
     return {
         metadataBase: new URL(BASE_URL),
         title,
         description,
         keywords: ROOTKEYWORDS,
-        robots: { index: true, follow: true },
+        // Partial translations render, but only complete locales are indexed.
+        robots: indexable
+            ? { index: true, follow: true }
+            : { index: false, follow: true },
         alternates: {
             canonical: `${BASE_URL}${localePath(locale, "/guide")}`,
-            languages: languageAlternates("/guide"),
+            ...(indexable ? { languages: languageAlternates("/guide") } : {}),
         },
         openGraph: {
             type: "article",
