@@ -45,14 +45,14 @@ const SECTION_ICONS = {
  *
  * The tool above is a client-rendered app shell: a crawler sees form labels
  * and an empty preview, not what the product does. This section carries the
- * one h2 set the page ranks on, the privacy and bulk-export explanations, and
- * the FAQ — server-rendered, so all of it exists before hydration.
+ * page's h1, the three keyword h2 sections, the privacy and bulk-export
+ * explanations, and the FAQ — server-rendered, so all of it exists before
+ * hydration.
  *
- * This section owns the page's only h1. It has to be visible: the page is the
- * one that ranks for "free invoice generator", and a visually hidden heading
- * gives a crawler the phrase but gives a reader nothing. The builder's own
- * section labels are h2s, so the outline still has exactly one top-level
- * heading.
+ * The h1 has to be visible: this is the page that ranks for "free invoice
+ * generator", and a visually hidden heading gives a crawler the phrase but
+ * gives a reader nothing. The builder's own section labels are h2s, so the
+ * outline still has exactly one top-level heading.
  */
 export default async function HomeContent({ locale }: { locale: string }) {
     const messages = await getMessagesSafe(locale);
